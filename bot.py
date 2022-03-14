@@ -139,7 +139,7 @@ def button(update: Update, context: CallbackContext):
                 ids.append(track.id)
                 counter += 1
         keyboard.append([InlineKeyboardButton(F"Get All Tracks", callback_data=F"getall|{album.id}")])
-        keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{album.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{album.artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
         query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
