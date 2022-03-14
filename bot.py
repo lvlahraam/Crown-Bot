@@ -150,8 +150,8 @@ def button(update: Update, context: CallbackContext):
             track.link,
             output_dir=F"./musics/",
             quality_download="MP3_320",
-            recursive_quality="True",
-            recursive_download="True",
+            recursive_quality=True,
+            recursive_download=True,
             method_save=2
         )
         query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
@@ -162,8 +162,9 @@ def button(update: Update, context: CallbackContext):
         download = dezloader.download_albumdee(
             album.link,
             output_dir=F"./musics/",
-            quality_download="MP3_320",
-            recursive_download="True",
+            quality_download="MP3_128",
+            recursive_quality=True,
+            recursive_download=True,
             method_save=2
         )
         query.message.reply_document(document=pathlib.Path(download.zip_path), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
