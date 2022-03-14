@@ -149,7 +149,7 @@ def button(update: Update, context: CallbackContext):
         download = dezloader.download_trackdee(
             track.link,
             output_dir=F"./musics/",
-            quality_download="MP3_320",
+            quality_download="MP3_128",
             recursive_quality=True,
             recursive_download=True,
             method_save=2
@@ -159,16 +159,19 @@ def button(update: Update, context: CallbackContext):
     elif relate == "getall":
         album = dezclient.get_album(id)
         query.answer(F"Downloading {album.title} album...")
-        download = dezloader.download_albumdee(
-            album.link,
-            output_dir=F"./musics/",
-            quality_download="MP3_128",
-            recursive_quality=True,
-            recursive_download=True,
-            method_save=2
-        )
-        query.message.reply_document(document=pathlib.Path(download.zip_path), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
-        os.remove(download.zip_path)
+        tracks = album.get_tracks()
+        for track in tracks:
+            download = dezloader.download_trackdee(
+                track.link,
+                output_dir=F"./musics/",
+                quality_download="MP3_128",
+                recursive_quality=True,
+                recursive_download=True,
+                method_save=2
+            )
+            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
+            os.remove(download.song_path)
+        query.message.reply_text("Done!")
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
