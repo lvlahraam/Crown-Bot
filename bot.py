@@ -1,6 +1,7 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
-import logging, os, pathlib, io, pydeezer
+import logging, os, pathlib, deezer
+import deezloader.deezloader as deezloader
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
 
@@ -9,7 +10,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-deezer = pydeezer.Deezer(arl=os.getenv("ARL"))
+dezclient = deezer.Client()
+dezloader = deezloader.DeeLogin(email=os.getenv("EMAIL"), password=os.getenv("PASSWORD"))
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
@@ -58,32 +60,32 @@ def searching(update: Update, context: CallbackContext):
             markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text(text="Invalid Deezer URL!", reply_markup=markup)
         elif text[3] == "artist":
-            artist = deezer.get_artist(text[4])
+            artist = dezclient.get_artist(text[4])
             keyboard = [
                 [
-                    InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['DATA']['ART_ID']}"),
-                    InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist['DATA']['ART_ID']}")
+                    InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
+                    InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist.id}")
                 ]
             ]
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=deezer.get_artist_poster(artist)['image'], caption=F"{artist['DATA']['ART_NAME']}", reply_markup=markup)
+            update.message.reply_photo(photo=artist.picture_big, caption=F"{artist.name}\n{artist.nb_album}\n{artist.nb_fan}", reply_markup=markup)
         elif text[3] == "album":
-            album = deezer.get_album(text[4])
-            tracks = deezer.get_album_tracks(album['id'])
+            album = dezclient.get_album(text[4])
+            tracks = album.get_tracks()
             keyboard = []
             if len(tracks) > 1:
                 counter = 1
                 for track in tracks:
-                    key = [InlineKeyboardButton(F"{track['TRACK_NUMBER']}. {track['SNG_TITLE']} 📀", callback_data=F"download|{track['SNG_ID']}")]
+                    key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                     keyboard.append(key)
                     counter += 1
             else:
-                key = [InlineKeyboardButton(F"{tracks[0]['SNG_TITLE']} 📀", callback_data=F"download|{tracks[0]['SNG_ID']}")]
+                key = [InlineKeyboardButton(F"{tracks[0].title} 📀", callback_data=F"download|{tracks[0].id}")]
                 keyboard.append(key)
-            if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
-            keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+            if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
+            keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+            update.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     else:
         keyboard = [
             [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=F".art {text}")],
@@ -101,125 +103,138 @@ def button(update: Update, context: CallbackContext):
     relate = data[0]
     id = data[1]
     if relate == "top10":
-        artist = deezer.get_artist(id)
-        tracks = deezer.get_artist_top_tracks(artist["DATA"]['ART_ID'])
+        artist = dezclient.get_artist(id)
+        tracks = artist.get_top()[:10]
         keyboard = []
         ids = []
         counter = 1
         for track in tracks:
-            if counter == 11: break
-            if track['SNG_ID'] in ids: pass
+            if track.id in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{track['TRACK_NUMBER']}. {track['SNG_TITLE']} [{track['ALB_TITLE']}]📀", callback_data=F"download|{track['SNG_ID']}")]
+                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
-                ids.append(track['SNG_ID'])
+                ids.append(track.id)
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['DATA']['ART_ID']}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['DATA']['ART_NAME']}'s Top Tracks...")
+        query.answer(F"Here are the {artist.name}'s Top Tracks...")
     elif relate == "albums":
-        artist = deezer.get_artist(id)
-        albums = artist['ALBUMS']['data']
+        artist = dezclient.get_artist(id)
+        albums = artist.get_albums()
         keyboard = []
         titles = []
+        counter = 1
         for album in albums:
-            if album['ALB_TITLE'] in titles: pass
+            if album.title in titles: pass
             else:
-                key = [InlineKeyboardButton(F"{album['ALB_TITLE']} 📼", callback_data=F"goalbum|{album['ALB_ID']}")]
+                key = [InlineKeyboardButton(F"{album.title} 📼", callback_data=F"goalbum|{album.id}")]
                 keyboard.append(key)
-                titles.append(album['ALB_TITLE'])
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['DATA']['ART_ID']}")])
+                titles.append(album.title)
+                counter += 1
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['DATA']['ART_NAME']}'s Albums...")
+        query.answer(F"Here are the {artist.name}'s Albums...")
     elif relate == "goartist":
-        artist = deezer.get_artist(id)
+        artist = dezclient.get_artist(id)
         keyboard = [
             [
-                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['DATA']['ART_ID']}"),
-                InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist['DATA']['ART_ID']}")
+                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
+                InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist.id}")
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_media(media=InputMediaPhoto(media=io.BytesIO.read(deezer.get_artist_poster(artist)['image'])))
-        query.edit_message_caption(artist["DATA"]["ART_NAME"])
+        query.edit_message_media(media=InputMediaPhoto(media=artist.picture_big))
+        query.edit_message_caption(artist.name)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Went to {artist['DATA']['ART_NAME']}'s Info...")
+        query.answer(F"Went to {artist.name}'s Info...")
     elif relate == "goalbum":
-        album = deezer.get_album(id)
-        tracks = deezer.get_album_tracks(album['id'])
+        album = dezclient.get_album(id)
+        tracks = album.get_tracks()
         keyboard = []
         ids = []
         counter = 1
         for track in tracks:
-            if track['SNG_ID'] in ids: pass
+            if track.id in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{track['TRACK_NUMBER']}. {track['SNG_TITLE']} 📀", callback_data=F"download|{track['SNG_ID']}")]
+                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
-                ids.append(track['SNG_ID'])
+                ids.append(track.id)
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
-        query.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
-        query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
+        query.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
+        query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
     elif relate == "getall":
-        album = deezer.get_album(id)
-        tracks = deezer.get_album_tracks(album['id'])
-        query.answer(F"Downloading {album['title']} album... One Track!")
+        album = dezclient.get_album(id)
+        tracks = album.get_tracks()
+        query.answer(F"Downloading {album.title} album...")
         query.delete_message()
-        downloads = []
         for track in tracks:
-            downloads.append(track["SNG_ID"])
-        download = pydeezer.Downloader(deezer, downloads, "./musics")
-        print(download.download_dir)
+            download = dezloader.download_trackdee(
+                track.link,
+                output_dir=F"./musics/",
+                quality_download="MP3_128",
+                recursive_quality=True,
+                recursive_download=True,
+                method_save=1
+            )
+            query.answer(F"Downloaded {track.title} track...")
+            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big)
+        query.message.reply_text("Done!")
     elif relate == "download":
-        album = deezer.get_album(track['info']['DATA']['ALB_ID'])
-        track = deezer.get_track(id)
-        query.answer(F"Downloading {track['SNG_TITLE']} track...")
-        download = deezer.download_track(track, "./musics/", quality=pydeezer.constants.track_formats.MP3_320, with_lyrics=True)
-        print(download)
-        # query.message.reply_audio(audio=, duration=track['info']['DATA']['DURATION'], performer=track['info']['DATA']['ART_NAME'], title=track['info']['DATA']['SNG_TITLE'], thumb=io.BytesIO.read(deezer.get_album_poster(album)['image']))
+        track = dezclient.get_track(id)
+        query.answer(F"Downloading {track.title} track...")
+        download = dezloader.download_trackdee(
+            track.link,
+            output_dir=F"./musics/",
+            quality_download="MP3_128",
+            recursive_quality=True,
+            recursive_download=True,
+            method_save=1
+        )
+        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if not text or not text.startswith(".") or text == ".art" or text == ".art " or text == ".alb" or text == ".alb " or text == ".trk" or text == ".trk ": return
     if text.startswith(".art"):
         text = text.strip(".art ")
-        search = deezer.search_artists(query=text)
+        search = dezclient.search_artists(query=text)
     elif text.startswith(".alb"):
         text = text.strip(".alb ")
-        search = deezer.search_albums(query=text)
+        search = dezclient.search_albums(query=text)
     elif text.startswith(".trk"):
         text = text.strip(".trk ")
-        search = deezer.search_tracks(query=text)
+        search = dezclient.search_albums(query=text)
     results = []
     ids = []
     for data in search:
-        if data['type'] == "artist":
-            title = data['name']
-            description = F"Albums: {data['nb_album']}\nFans: {data['nb_fan']}"
-            thumbnail = data['picture']
-        elif data['type'] == "album":
-            title = data['title']
-            description = F"Artist: {data['artist']['name']}\nTracks: {data['nb_tracks']}"
-            thumbnail = data['cover']
-        elif data['type'] == "track":
-            title = data['title']
-            description = F"Artist: {data['artist']['name']}\nAlbum: {data['album']['title']}"
-            thumbnail = data['album']['cover']
-        if not data['id'] in ids:
+        if isinstance(data, deezer.Artist):
+            title = data.name
+            description = F"Albums: {data.nb_album}\nFans: {data.nb_fan}"
+            thumbnail = data.picture
+        elif isinstance(data, deezer.Album):
+            title = data.title
+            description = F"Artist: {data.artist.name}\nTracks: {data.nb_tracks}"
+            thumbnail = data.cover
+        elif isinstance(data, deezer.Track):
+            title = data.title
+            description = F"Artist: {data.artist.name}\nAlbum: {data.album.title}"
+            thumbnail = data.md5_image
+        if not data.id in ids:
             result = InlineQueryResultArticle(
-                id=data['id'],
+                id=data.id,
                 title=title,
                 description=description,
                 thumb_url=thumbnail,
-                input_message_content=InputTextMessageContent(data['link']),
+                input_message_content=InputTextMessageContent(data.link),
             )
             if len(results) >= 50: break
             results.append(result)
-            ids.append(data['id'])
+            ids.append(data.id)
         else: pass
     update.inline_query.answer(results)
 

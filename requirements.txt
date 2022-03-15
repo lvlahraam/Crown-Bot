@@ -1,2 +1,3 @@
-py-deezer
 python-telegram-bot
+deezer-python
+deezloader
