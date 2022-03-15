@@ -53,11 +53,15 @@ def searching(update: Update, context: CallbackContext):
             album = dezclient.get_album(text[4])
             tracks = album.get_tracks()
             keyboard = []
-            counter = 1
-            for track in tracks:
-                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
+            if len(tracks) > 1:
+                counter = 1
+                for track in tracks:
+                    key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
+                    keyboard.append(key)
+                    counter += 1
+            else:
+                key = [InlineKeyboardButton(F"{track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
-                counter += 1
             if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
             keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
             markup = InlineKeyboardMarkup(keyboard)
@@ -147,15 +151,15 @@ def button(update: Update, context: CallbackContext):
         album = dezclient.get_album(id)
         query.answer(F"Choose which way you want to download...")
         keyboard = [
-            [InlineKeyboardButton("One Track 📀 ?!", callback_data=F"onetrack|{album.id}")],
-            [InlineKeyboardButton("Full Album 📼 ?!", callback_data=F"fullalbum|{album.id}")]
+            [InlineKeyboardButton("One Track 📀", callback_data=F"onetrack|{album.id}")],
+            [InlineKeyboardButton("Full Album 📼", callback_data=F"fullalbum|{album.id}")]
         ]
         markup = InlineKeyboardMarkup(keyboard)
         query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     elif relate == "onetrack":
         album = dezclient.get_album(id)
         tracks = album.get_tracks()
-        query.answer(F"Downloading {album.title} album... One by Track!")
+        query.answer(F"Downloading {album.title} album... One Track!")
         query.delete_message()
         for track in tracks:
             download = dezloader.download_trackdee(
@@ -167,7 +171,6 @@ def button(update: Update, context: CallbackContext):
                 method_save=2
             )
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
-            os.remove(download.song_path)
         query.message.reply_text("Done!")
     elif relate == "fullalbum":
         album = dezclient.get_album(id)
@@ -182,7 +185,6 @@ def button(update: Update, context: CallbackContext):
             method_save=2
         )
         query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
-        os.remove(download.zip_path)
     elif relate == "download":
         track = dezclient.get_track(id)
         query.answer(F"Downloading {track.title} track...")
@@ -195,7 +197,6 @@ def button(update: Update, context: CallbackContext):
             method_save=2
         )
         query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
-        os.remove(download.song_path)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
