@@ -216,7 +216,7 @@ def inline(update: Update, context: CallbackContext):
             return update.inline_query.answer(results=[item])
     elif text.startswith(".trks"):
         if query.isdigit():
-            search = dezapi.get_artist_top_tracks(query, limit=50)
+            search = dezapi.get_artist_top_tracks(query, limit=10)
         else:
             item = result = InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
