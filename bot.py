@@ -214,21 +214,24 @@ def inline(update: Update, context: CallbackContext):
     elif text.startswith(".trk"):
         search = dezclient.search_albums(query=query)
     results = []
-    ids = []
+    added = []
     for data in search:
         if isinstance(data, deezer.Artist):
             title = data.name
             description = data.nb_album
             thumbnail = data.picture
+            add = data.name
         elif isinstance(data, deezer.Album):
             title = data.title
             description = data.artist.name
             thumbnail = data.cover
+            add = data.title
         elif isinstance(data, deezer.Track):
             title = data.title
             description = F"{data.artist.name}\n{data.album.title}"
             thumbnail = data.album.cover
-        if not data.id in ids:
+            add = data.title
+        if not add in added:
             result = InlineQueryResultArticle(
                 id=data.id,
                 title=title,
@@ -238,7 +241,7 @@ def inline(update: Update, context: CallbackContext):
             )
             if len(results) >= 50: break
             results.append(result)
-            ids.append(data.id)
+            added.append(add)
         else: pass
     update.inline_query.answer(results)
 
