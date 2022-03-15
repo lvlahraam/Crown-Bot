@@ -199,10 +199,6 @@ def inline(update: Update, context: CallbackContext):
             artist = dezclient.get_artist(text)
             search = artist.get_albums()
         else:
-        if text.isdigit():
-            artist = dezclient.get_artist(text)
-            search = artist.get_albums()
-        else:
             item = result = InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
                 title="Not an ID!",
