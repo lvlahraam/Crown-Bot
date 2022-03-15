@@ -175,7 +175,7 @@ def button(update: Update, context: CallbackContext):
                 method_save=1
             )
             query.answer(F"Downloaded {track.title} track...")
-            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=60)
+            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=30)
         query.message.reply_text("Done!")
     elif relate == "download":
         track = dezclient.get_track(id)
@@ -188,11 +188,11 @@ def button(update: Update, context: CallbackContext):
             recursive_download=True,
             method_save=1
         )
-        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=60)
+        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=30)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
-    if not text or not text.startswith(".") or not text.startswith(".a") or not text.startswith(".t") or text == ".albs" or text == ".albs " or text == ".art" or text == ".art " or text == ".alb" or text == ".alb " or text == ".trk" or text == ".trk": return
+    if not text or not text.startswith("."): return
     if text.startswith(".albs"):
         text = text.strip(".albs ")
         search = dezclient.get_artist(text).get_albums()
