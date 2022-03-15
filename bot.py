@@ -142,7 +142,7 @@ def button(update: Update, context: CallbackContext):
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_media(media=InputMediaPhoto(media=io.BytesIO.read(deezer.get_artist_poster(artist["DATA"]))))
+        query.edit_message_media(media=InputMediaPhoto(media=io.BytesIO.read(deezer.get_artist_poster(artist)['image'])))
         query.edit_message_caption(artist["DATA"]["ART_NAME"])
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Went to {artist['DATA']['ART_NAME']}'s Info...")
@@ -175,11 +175,12 @@ def button(update: Update, context: CallbackContext):
         download = pydeezer.Downloader(deezer, downloads, "./musics")
         print(download.download_dir)
     elif relate == "download":
+        album = deezer.get_album(track['info']['DATA']['ALB_ID'])
         track = deezer.get_track(id)
         query.answer(F"Downloading {track['SNG_TITLE']} track...")
         download = deezer.download_track(track, "./musics/", quality=pydeezer.constants.track_formats.MP3_320, with_lyrics=True)
         print(download)
-        # query.message.reply_audio(audio=, duration=track['info']['DATA']['DURATION'], performer=track['info']['DATA']['ART_NAME'], title=track['info']['DATA']['SNG_TITLE'], thumb=io.BytesIO.read(deezer.get_album_poster(track['info']['DATA']['ALB_ID'])))
+        # query.message.reply_audio(audio=, duration=track['info']['DATA']['DURATION'], performer=track['info']['DATA']['ART_NAME'], title=track['info']['DATA']['SNG_TITLE'], thumb=io.BytesIO.read(deezer.get_album_poster(album)['image']))
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
