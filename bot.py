@@ -201,7 +201,7 @@ def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
     query = text.split(" ")
-    query = " ".join(query)
+    query = " ".join(query[1:])
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
