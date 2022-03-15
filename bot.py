@@ -99,14 +99,14 @@ def button(update: Update, context: CallbackContext):
         artist = dezclient.get_artist(id)
         albums = artist.get_albums()
         keyboard = []
-        ids = []
+        titles = []
         counter = 1
         for album in albums:
-            if album.id in ids: pass
+            if album.title in titles: pass
             else:
                 key = [InlineKeyboardButton(F"{album.title} 📼", callback_data=F"goalbum|{album.id}")]
                 keyboard.append(key)
-                ids.append(album.id)
+                titles.append(album.title)
                 counter += 1
         keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
