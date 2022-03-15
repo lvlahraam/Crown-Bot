@@ -33,7 +33,7 @@ def help(update: Update, context: CallbackContext):
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text(text="You can search for music by sending a message\nOr sending the deezer url\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow", reply_markup=markup)
+    update.message.reply_text(text="You can search for music by sending a message\nOr sending the deezer url\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow\n\nFor artist's albums you could do @crownmusicbot .albs [artist's deezer id]\nOr by just searching for the artist and then click on albums button", reply_markup=markup)
 
 def searching(update: Update, context: CallbackContext):
     text = update.message.text
@@ -199,9 +199,15 @@ def inline(update: Update, context: CallbackContext):
             artist = dezclient.get_artist(text)
             search = artist.get_albums()
         else:
+        if text.isdigit():
+            artist = dezclient.get_artist(text)
+            search = artist.get_albums()
+        else:
             item = result = InlineQueryResultArticle(
+                id="BADALBUMSSEARCH",
                 title="Not an ID!",
                 description="Query must be the artist's ID",
+                input_message_content=InputTextMessageContent("/help")
             )
             return update.inline_query.answer(results=[item])
     elif text.startswith(".art"):
