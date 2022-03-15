@@ -206,7 +206,7 @@ def inline(update: Update, context: CallbackContext):
     for data in search['data']:
         if data['type'] == "artist":
             name = data['name']
-            description = F"{data['nb_album']}\n{data['nb_fans']}"
+            description = F"{data['nb_album']}\n{data['nb_fan']}"
             thumbnail = data['picture']
             add = data['name']
         elif data['type'] == "album":
