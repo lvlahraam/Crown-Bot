@@ -196,15 +196,15 @@ def inline(update: Update, context: CallbackContext):
     results = []
     ids = []
     for data in search:
-        if isinstance(data, pydeezer.constants.search_types.ARTIST):
+        if data['type'] == "artist":
             title = data['name']
             description = F"Albums: {data['nb_album']}\nFans: {data['nb_fan']}"
             thumbnail = data['picture']
-        elif isinstance(data, pydeezer.constants.search_types.ALBUM):
+        elif data['type'] == "album":
             title = data['title']
             description = F"Artist: {data['artist']['name']}\nTracks: {data['nb_tracks']}"
             thumbnail = data['cover']
-        elif isinstance(data, pydeezer.constants.search_types.TRACK):
+        elif data['type'] == "track":
             title = data['title']
             description = F"Artist: {data['artist']['name']}\nAlbum: {data['album']['title']}"
             thumbnail = data['album']['cover']
