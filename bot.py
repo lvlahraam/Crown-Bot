@@ -1,6 +1,6 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
-import logging, os, pathlib, time, deezer
+import logging, os, pathlib, deezer
 from deezloader import deezloader
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
@@ -220,15 +220,15 @@ def inline(update: Update, context: CallbackContext):
     for data in search:
         if isinstance(data, deezer.Artist):
             title = data.name
-            description = F"Albums: {getattr(data, 'nb_album', 'None')}\nFans: {getattr(data, 'nb_fan', 'None')}"
+            description = data.nb_album
             thumbnail = data.picture
         elif isinstance(data, deezer.Album):
             title = data.title
-            description = F"Artist: {data.artist.name}\nTracks: {getattr(data, 'nb_tracks', 'None')}"
+            description = data.artist.name
             thumbnail = data.cover
         elif isinstance(data, deezer.Track):
             title = data.title
-            description = F"Artist: {data.artist.name}\nAlbum: {data.album.title}"
+            description = F"{data.artist.name}\n{data.album.title}"
             thumbnail = data.album.cover
         if not data.id in ids:
             result = InlineQueryResultArticle(
