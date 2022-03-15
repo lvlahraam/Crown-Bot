@@ -1,8 +1,6 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
 import logging, os, pathlib, deezer
-from deezloader import deezloader
-from deezloader.deezloader import API
 from deezloader.deezloader import DeeLogin as Login, API as dezapi
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
@@ -195,7 +193,7 @@ def button(update: Update, context: CallbackContext):
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
-    query = text.strip(".albs ").strip(".art ").strip(".alb ").strip(".trk ")
+    query = text.strip(".albs").strip(".art").strip(".alb").strip(".trk")
     if query is None: return
     if text.startswith(".art"):
         search = dezapi.search_artist(query=query)
@@ -205,7 +203,7 @@ def inline(update: Update, context: CallbackContext):
         search = dezapi.search_track(query=query)
     results = []
     added = []
-    for data in search:
+    for data in search['data']:
         if data['type'] == "artist":
             name = data['name']
             description = F"{data['nb_album']}\n{data['nb_fans']}"
