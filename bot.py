@@ -61,12 +61,12 @@ def searching(update: Update, context: CallbackContext):
             artist = deezer.get_artist(text[4])
             keyboard = [
                 [
-                    InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['id']}"),
-                    InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist['id']}")
+                    InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['DATA']['ART_ID']}"),
+                    InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist['DATA']['ART_ID']}")
                 ]
             ]
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=artist["picture_big"], caption=F"{artist['name']}\n{artist['nb_album']}\n{artist['nb_fan']}", reply_markup=markup)
+            update.message.reply_photo(photo=deezer.get_artist_poster(artist), caption=F"{artist['DATA']['ART_NAME']}", reply_markup=markup)
         elif text[3] == "album":
             album = deezer.get_album(text[4])
             tracks = deezer.get_album_tracks(album['id'])
@@ -102,7 +102,7 @@ def button(update: Update, context: CallbackContext):
     id = data[1]
     if relate == "top10":
         artist = deezer.get_artist(id)
-        deezer.get_artist_top_tracks(artist['ART_ID'])
+        tracks = deezer.get_artist_top_tracks(artist["DATA"]['ART_ID'])
         keyboard = []
         ids = []
         counter = 1
@@ -117,7 +117,7 @@ def button(update: Update, context: CallbackContext):
         keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['DATA']['ART_ID']}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['ART_NAME']}'s Top Tracks...")
+        query.answer(F"Here are the {artist['DATA']['ART_NAME']}'s Top Tracks...")
     elif relate == "albums":
         artist = deezer.get_artist(id)
         albums = artist['ALBUMS']['data']
@@ -132,7 +132,7 @@ def button(update: Update, context: CallbackContext):
         keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['DATA']['ART_ID']}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['ART_NAME']}'s Albums...")
+        query.answer(F"Here are the {artist['DATA']['ART_NAME']}'s Albums...")
     elif relate == "goartist":
         artist = deezer.get_artist(id)
         keyboard = [
