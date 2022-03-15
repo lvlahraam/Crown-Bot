@@ -33,7 +33,7 @@ def help(update: Update, context: CallbackContext):
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text(text="You can search for music by sending a message\nOr sending the deezer url\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr Even by using these buttons bellow", reply_markup=markup)
+    update.message.reply_text(text="You can search for music by sending a message\nOr sending the deezer url\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow", reply_markup=markup)
 
 def searching(update: Update, context: CallbackContext):
     text = update.message.text
@@ -41,22 +41,22 @@ def searching(update: Update, context: CallbackContext):
         text = text.split("/")
         if "deezer" not in text[2]:
             keyboard = [
-				[InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
-				[
-					InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
-					InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
-				]
-			]
+	    	    [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+	    	    [
+			        InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
+		    	    InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+	    	    ]
+	        ]
             markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text(text="The URL needs to be from Deezer!", reply_markup=markup)
         elif text[3] not in ("artist", "album"):
             keyboard = [
-				[InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
-				[
-					InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
-					InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
-				]
-			]
+	    	    [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+	    	    [
+		            InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
+		            InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+	    	    ]
+	        ]
             markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text(text="Invalid Deezer URL!", reply_markup=markup)
         elif text[3] == "artist":
@@ -205,7 +205,7 @@ def button(update: Update, context: CallbackContext):
             method_save=1
         )
         print(download.zip_path, pathlib.Path(download.zip_path))
-        query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_big)
+        # query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_big)
     elif relate == "download":
         track = dezclient.get_track(id)
         query.answer(F"Downloading {track.title} track...")
