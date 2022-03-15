@@ -1,7 +1,7 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
 import logging, os, pathlib
-from deezloader.deezloader import DeeLogin as Login, API as dezapi
+from deezloader.deezloader import DeeLogin as Login, API as dezapi, API_GW
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
 
@@ -11,6 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 dezlog = Login(arl=os.getenv("ARL"))
+dezgw = API_GW(arl=os.getenv("ARL"))
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
@@ -80,7 +81,10 @@ def searching(update: Update, context: CallbackContext):
                 track = dezapi.get_track(items[4])
                 keyboard = [
                     [InlineKeyboardButton(F"{track['title']} 📀", callback_data=F"download|{track['id']}")],
-                    [InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")]
+                    [
+                        InlineKeyboardButton(F"Get The Lyrics 📓", callback_data=F"lyrics|{track['id']}"),
+                        InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
+                    ]
                 ]
                 markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['artist']['name']} - {track['title']}", reply_markup=markup)
@@ -136,6 +140,12 @@ def button(update: Update, context: CallbackContext):
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Here are the {artist['name']}'s Albums...")
+    elif relate == "lyrics":
+        track = dezapi.get_track(query)
+        lyrics = dezgw.get_lyric(query)
+        query.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['album']['artist']['name']} - {track['title']}\n\n{lyrics['LYRICS_TEXT']}")
+        query.message.reply_photo()
+        query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = dezapi.get_artist(id)
         keyboard = [
