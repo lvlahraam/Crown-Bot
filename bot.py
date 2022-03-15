@@ -196,8 +196,8 @@ def inline(update: Update, context: CallbackContext):
     query = text.strip(".albs ").strip(".art ").strip(".alb ").strip(".trk ")
     if query is None: return
     if text.startswith(".albs"):
-        if text.isdigit():
-            artist = dezclient.get_artist(text)
+        if query.isdigit():
+            artist = dezclient.get_artist(artist_id=query)
             search = artist.get_albums()
         else:
             item = result = InlineQueryResultArticle(
@@ -208,11 +208,11 @@ def inline(update: Update, context: CallbackContext):
             )
             return update.inline_query.answer(results=[item])
     elif text.startswith(".art"):
-        search = dezclient.search_artists(query=text)
+        search = dezclient.search_artists(query=query)
     elif text.startswith(".alb"):
-        search = dezclient.search_albums(query=text)
+        search = dezclient.search_albums(query=query)
     elif text.startswith(".trk"):
-        search = dezclient.search_albums(query=text)
+        search = dezclient.search_albums(query=query)
     results = []
     ids = []
     for data in search:
