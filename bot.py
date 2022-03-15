@@ -1,6 +1,6 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
-import logging, os, pathlib, deezer
+import logging, os, pathlib
 from deezloader.deezloader import DeeLogin as Login, API as dezapi
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
@@ -40,7 +40,7 @@ def searching(update: Update, context: CallbackContext):
     if "/" in text:
         items = text.split("/")
         if "deezer" in items[2]:
-            if items[3] not in ("artist", "album"):
+            if items[3] not in ("artist", "album", "track"):
                 keyboard = [
                     [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
                     [
@@ -54,7 +54,7 @@ def searching(update: Update, context: CallbackContext):
                 artist = dezapi.get_artist(items[4])
                 keyboard = [
                     [
-                        InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['id']}"),
+                        InlineKeyboardButton("Top 10 Tracks 🌟", switch_inline_query_current_chat=F".trks {artist['id']}"),
                         InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
                     ]
                 ]
@@ -63,6 +63,22 @@ def searching(update: Update, context: CallbackContext):
             elif items[3] == "album":
                 album = dezapi.get_album(items[4])
                 tracks = album['tracks']['data']
+                keyboard = []
+                if len(tracks) > 1:
+                    counter = 1
+                    for track in tracks:
+                        key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
+                        keyboard.append(key)
+                        counter += 1
+                else:
+                    key = [InlineKeyboardButton(F"{tracks[0]['title']} 📀", callback_data=F"download|{tracks[0]['id']}")]
+                    keyboard.append(key)
+                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
+                keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+                markup = InlineKeyboardMarkup(keyboard)
+                update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+            elif items[3] == "track":
+                track = dezapi.get_track(items[4])
                 keyboard = []
                 if len(tracks) > 1:
                     counter = 1
@@ -133,7 +149,7 @@ def button(update: Update, context: CallbackContext):
         artist = dezapi.get_artist(id)
         keyboard = [
             [
-                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['id']}"),
+                InlineKeyboardButton("Top 10 Tracks 🌟", switch_inline_query_current_chat=F".trks {artist['id']}"),
                 InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
             ]
         ]
@@ -193,11 +209,22 @@ def button(update: Update, context: CallbackContext):
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
-    query = text.strip(".albs").strip(".art").strip(".alb").strip(".trk")
+    query = text.strip(".albs").strip(".trks").strip(".art").strip(".alb").strip(".trk")
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
             search = dezapi.get_artist_top_albums(query, limit=50)
+        else:
+            item = result = InlineQueryResultArticle(
+                id="BADALBUMSSEARCH",
+                title="Not an ID!",
+                description="Query must be the artist's ID",
+                input_message_content=InputTextMessageContent("/help")
+            )
+            return update.inline_query.answer(results=[item])
+    elif text.startswith(".trks"):
+        if query.isdigit():
+            search = dezapi.get_artist_top_tracks(query, limit=50)
         else:
             item = result = InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
