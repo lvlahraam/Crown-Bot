@@ -246,7 +246,9 @@ def inline(update: Update, context: CallbackContext):
             add = data['title']
         elif data['type'] == "track":
             name = data['title']
-            description = F"{data['artist']['name']}\n{data['album']['title']}"
+            if not data.get("artist"): artist = dezapi.get_artist(query)
+            else: artist = data['artist']
+            description = F"{artist['name']}\n{data['album']['title']}"
             thumbnail = data['album']['cover']
             add = data['title']
         if not add in added:
