@@ -2,6 +2,8 @@
 
 import logging, os, pathlib, deezer
 from deezloader import deezloader
+from deezloader.deezloader import API
+from deezloader.deezloader import DeeLogin as Login, API as dezapi
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
 
@@ -11,7 +13,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 dezclient = deezer.Client()
-dezloader = deezloader.DeeLogin(arl=os.getenv("ARL"))
+dezloader = Login(arl=os.getenv("ARL"))
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
@@ -195,49 +197,37 @@ def inline(update: Update, context: CallbackContext):
     if text is None or not text.startswith("."): return
     query = text.strip(".albs ").strip(".art ").strip(".alb ").strip(".trk ")
     if query is None: return
-    if text.startswith(".albs"):
-        if query.isdigit():
-            artist = dezclient.get_artist(artist_id=query)
-            search = artist.get_albums()
-        else:
-            item = result = InlineQueryResultArticle(
-                id="BADALBUMSSEARCH",
-                title="Not an ID!",
-                description="Query must be the artist's ID",
-                input_message_content=InputTextMessageContent("/help")
-            )
-            return update.inline_query.answer(results=[item])
-    elif text.startswith(".art"):
-        search = dezclient.search_artists(query=query)
+    if text.startswith(".art"):
+        search = dezapi.search_artist(query=query)
     elif text.startswith(".alb"):
-        search = dezclient.search_albums(query=query)
+        search = dezapi.search_album(query=query)
     elif text.startswith(".trk"):
-        search = dezclient.search_albums(query=query)
+        search = dezapi.search_track(query=query)
     results = []
     added = []
     for data in search:
-        if isinstance(data, deezer.Artist):
-            title = data.name
-            description = data.nb_album
-            thumbnail = data.picture
-            add = data.name
-        elif isinstance(data, deezer.Album):
-            title = data.title
-            description = data.artist.name
-            thumbnail = data.cover
-            add = data.title
-        elif isinstance(data, deezer.Track):
-            title = data.title
-            description = F"{data.artist.name}\n{data.album.title}"
-            thumbnail = data.album.cover
-            add = data.title
+        if data['type'] == "artist":
+            name = data['name']
+            description = F"{data['nb_album']}\n{data['nb_fans']}"
+            thumbnail = data['picture']
+            add = data['name']
+        elif data['type'] == "album":
+            name = data['title']
+            description = F"{data['artist']['name']}\n{data['nb_tracks']}"
+            thumbnail = data['cover']
+            add = data['title']
+        elif data['type'] == "track":
+            name = data['title']
+            description = F"{data['arist']['name']}\n{data['album']['title']}"
+            thumbnail = data['album']['cover']
+            add = data['title']
         if not add in added:
             result = InlineQueryResultArticle(
-                id=data.id,
-                title=title,
+                id=data['id'],
+                title=name,
                 description=description,
                 thumb_url=thumbnail,
-                input_message_content=InputTextMessageContent(data.link),
+                input_message_content=InputTextMessageContent(data['link']),
             )
             if len(results) >= 50: break
             results.append(result)
