@@ -143,23 +143,20 @@ def button(update: Update, context: CallbackContext):
         markup = InlineKeyboardMarkup(keyboard)
         query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
         query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
-    elif relate == "download":
-        track = dezclient.get_track(id)
-        query.answer(F"Downloading {track.title} track...")
-        download = dezloader.download_trackdee(
-            track.link,
-            output_dir=F"./musics/",
-            quality_download="MP3_128",
-            recursive_quality=True,
-            recursive_download=True,
-            method_save=2
-        )
-        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
-        os.remove(download.song_path)
     elif relate == "getall":
         album = dezclient.get_album(id)
-        query.answer(F"Downloading {album.title} album...")
+        query.answer(F"Choose which way you want to download...")
+        keyboard = [
+            [InlineKeyboardButton("One Track 📀 ?!", callback_data=F"onetrack|{album.id}")],
+            [InlineKeyboardButton("Full Album 📼 ?!", callback_data=F"fullalbum|{album.id}")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+        query.message.reply_photo(photo=album.cover_medium, caption=F"Choose your way:\n{album.artist.name} - {album.title}", reply_markup=markup)
+    elif relate == "onetrack":
+        album = dezclient.get_album(id)
         tracks = album.get_tracks()
+        query.answer(F"Downloading {album.title} album... One by Track!")
+        query.delete_message()
         for track in tracks:
             download = dezloader.download_trackdee(
                 track.link,
@@ -172,6 +169,33 @@ def button(update: Update, context: CallbackContext):
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
             os.remove(download.song_path)
         query.message.reply_text("Done!")
+    elif relate == "fullalbum":
+        album = dezclient.get_album(id)
+        query.answer(F"Downloading {album.title} album... Full Album")
+        query.delete_message()
+        download = dezloader.download_albumdee(
+            album.link,
+            output_dir=F"./musics/",
+            quality_download="MP3_128",
+            recursive_quality=True,
+            recursive_download=True,
+            method_save=2
+        )
+        query.message.reply_document(document=pathlib.Path(download.zip_path), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
+        os.remove(download.zip_path)
+    elif relate == "download":
+        track = dezclient.get_track(id)
+        query.answer(F"Downloading {track.title} track...")
+        download = dezloader.download_trackdee(
+            track.link,
+            output_dir=F"./musics/",
+            quality_download="MP3_320",
+            recursive_quality=True,
+            recursive_download=True,
+            method_save=2
+        )
+        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
+        os.remove(download.song_path)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
@@ -229,6 +253,12 @@ def main():
         updater.dispatcher.add_handler(CallbackQueryHandler(button))
         updater.dispatcher.add_handler(InlineQueryHandler(inline))
 
+        commands = [
+            BotCommand("start", "Starts the bot"),
+            BotCommand("help", "Helps you to use the bot"),
+        ]
+        updater.bot.set_my_commands(commands)
+        
         updater.start_polling()
         updater.idle()
     except Exception as e:
