@@ -78,20 +78,12 @@ def searching(update: Update, context: CallbackContext):
                 update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
             elif items[3] == "track":
                 track = dezapi.get_track(items[4])
-                keyboard = []
-                if len(tracks) > 1:
-                    counter = 1
-                    for track in tracks:
-                        key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
-                        keyboard.append(key)
-                        counter += 1
-                else:
-                    key = [InlineKeyboardButton(F"{tracks[0]['title']} 📀", callback_data=F"download|{tracks[0]['id']}")]
-                    keyboard.append(key)
-                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
-                keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+                keyboard = [
+                    [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")],
+                    [InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")]
+                ]
                 markup = InlineKeyboardMarkup(keyboard)
-                update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+                update.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['artist']['name']} - {track['title']}", reply_markup=markup)
         else:
             update.message.reply_text(text=F"Invalid {'spotify' if 'spotify'in items[2] else 'deezer'} url!\n\n1. The url must either be from deezer.com or spotify.com\n2. If your given url is a playlist:\nThis Bot will not download playlists, Due to the playlist might be a day long")
     else:
@@ -208,7 +200,7 @@ def button(update: Update, context: CallbackContext):
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
-    query = text.strip(".albs").strip(".trks").strip(".art").strip(".alb").strip(".trk")
+    query = text.strip(".albs").strip(".trks").strip(".art").strip(".alb").strip(".trk")[2:]
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
