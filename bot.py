@@ -66,7 +66,7 @@ def searching(update: Update, context: CallbackContext):
                 ]
             ]
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=deezer.get_artist_poster(artist), caption=F"{artist['DATA']['ART_NAME']}", reply_markup=markup)
+            update.message.reply_photo(photo=deezer.get_artist_poster(artist)['image'], caption=F"{artist['DATA']['ART_NAME']}", reply_markup=markup)
         elif text[3] == "album":
             album = deezer.get_album(text[4])
             tracks = deezer.get_album_tracks(album['id'])
