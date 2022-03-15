@@ -192,9 +192,10 @@ def button(update: Update, context: CallbackContext):
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
-    if not text or not text.startswith("."): return
+    if text is None or not text.startswith("."): return
+    query = text.strip(".albs ").strip(".art ").strip(".alb ").strip(".trk ")
+    if query is None: return
     if text.startswith(".albs"):
-        text = text.strip(".albs ")
         if text.isdigit():
             artist = dezclient.get_artist(text)
             search = artist.get_albums()
@@ -207,13 +208,10 @@ def inline(update: Update, context: CallbackContext):
             )
             return update.inline_query.answer(results=[item])
     elif text.startswith(".art"):
-        text = text.strip(".art ")
         search = dezclient.search_artists(query=text)
     elif text.startswith(".alb"):
-        text = text.strip(".alb ")
         search = dezclient.search_albums(query=text)
     elif text.startswith(".trk"):
-        text = text.strip(".trk ")
         search = dezclient.search_albums(query=text)
     results = []
     ids = []
