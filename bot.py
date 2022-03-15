@@ -15,7 +15,7 @@ dezloader = deezloader.DeeLogin(email=os.getenv("EMAIL"), password=os.getenv("PA
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
-        [InlineKeyboardButton("Search Arist 👤", switch_inline_query_current_chat=".art ")],
+        [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
             InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
             InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
@@ -26,7 +26,7 @@ def start(update: Update, context: CallbackContext):
 
 def help(update: Update, context: CallbackContext):
     keyboard = [
-        [InlineKeyboardButton("Search Arist 👤", switch_inline_query_current_chat=".art ")],
+        [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
             InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
             InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
@@ -43,8 +43,8 @@ def searching(update: Update, context: CallbackContext):
             artist = dezclient.get_artist(text[4])
             keyboard = [
                 [
-                    InlineKeyboardButton("Top 10 Tracks", callback_data=F"top10|{artist.id}"),
-                    InlineKeyboardButton("Albums", callback_data=F"albums|{artist.id}")
+                    InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
+                    InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist.id}")
                 ]
             ]
             markup = InlineKeyboardMarkup(keyboard)
@@ -55,16 +55,16 @@ def searching(update: Update, context: CallbackContext):
             keyboard = []
             counter = 1
             for track in tracks:
-                key = [InlineKeyboardButton(F"{counter}. {track.title}", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
                 counter += 1
-            if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks", callback_data=F"getall|{album.id}")])
-            keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{album.artist.id}")])
+            if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
+            keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
             markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     else:
         keyboard = [
-            [InlineKeyboardButton("Search Arist 👤", switch_inline_query_current_chat=F".art {text}")],
+            [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=F".art {text}")],
             [
                 InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=F".alb {text}"),
                 InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=F".trk {text}")
@@ -87,11 +87,11 @@ def button(update: Update, context: CallbackContext):
         for track in tracks:
             if track.id in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{counter}. {track.title}", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
                 ids.append(track.id)
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Here are the {artist.name}'s Top Tracks...")
@@ -104,11 +104,11 @@ def button(update: Update, context: CallbackContext):
         for album in albums:
             if album.id in ids: pass
             else:
-                key = [InlineKeyboardButton(album.title, callback_data=F"goalbum|{album.id}")]
+                key = [InlineKeyboardButton(F"{album.title} 📼", callback_data=F"goalbum|{album.id}")]
                 keyboard.append(key)
                 ids.append(album.id)
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Here are the {artist.name}'s Albums...")
@@ -116,8 +116,8 @@ def button(update: Update, context: CallbackContext):
         artist = dezclient.get_artist(id)
         keyboard = [
             [
-                InlineKeyboardButton("Top 10 Tracks", callback_data=F"top10|{artist.id}"),
-                InlineKeyboardButton("Albums", callback_data=F"albums|{artist.id}")
+                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
+                InlineKeyboardButton("Albums 📼", callback_data=F"albums|{artist.id}")
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
@@ -134,12 +134,12 @@ def button(update: Update, context: CallbackContext):
         for track in tracks:
             if track.id in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{counter}. {track.title}", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
                 keyboard.append(key)
                 ids.append(track.id)
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Get All Tracks", callback_data=F"getall|{album.id}")])
-        keyboard.append([InlineKeyboardButton(F"Go To Artist", callback_data=F"goartist|{album.artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
         query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
