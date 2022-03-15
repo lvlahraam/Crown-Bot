@@ -195,7 +195,15 @@ def inline(update: Update, context: CallbackContext):
     if not text or not text.startswith("."): return
     if text.startswith(".albs"):
         text = text.strip(".albs ")
-        search = dezclient.get_artist(text).get_albums()
+        if text.isdigit():
+            artist = dezclient.get_artist(text)
+            search = artist.get_albums()
+        else:
+            item = result = InlineQueryResultArticle(
+                title="Not an ID!",
+                description="Query must be the artist's ID",
+            )
+            return update.inline_query.answer(results=[item])
     elif text.startswith(".art"):
         text = text.strip(".art ")
         search = dezclient.search_artists(query=text)
@@ -210,16 +218,16 @@ def inline(update: Update, context: CallbackContext):
     for data in search:
         if isinstance(data, deezer.Artist):
             title = data.name
-            description = F"Albums: {data.nb_album}\nFans: {data.nb_fan}"
+            description = F"Albums: {getattr(data, 'nb_album', 'None')}\nFans: {getattr(data, 'nb_fan', 'None')}"
             thumbnail = data.picture
         elif isinstance(data, deezer.Album):
             title = data.title
-            description = F"Artist: {data.artist.name}\nTracks: {data.nb_tracks or 1}"
+            description = F"Artist: {data.artist.name}\nTracks: {getattr(data, 'nb_tracks', 'None')}"
             thumbnail = data.cover
         elif isinstance(data, deezer.Track):
             title = data.title
             description = F"Artist: {data.artist.name}\nAlbum: {data.album.title}"
-            thumbnail = data.md5_image
+            thumbnail = data.album.cover
         if not data.id in ids:
             result = InlineQueryResultArticle(
                 id=data.id,
