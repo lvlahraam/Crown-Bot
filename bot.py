@@ -151,7 +151,7 @@ def button(update: Update, context: CallbackContext):
             [InlineKeyboardButton("Full Album 📼 ?!", callback_data=F"fullalbum|{album.id}")]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.message.reply_photo(photo=album.cover_medium, caption=F"Choose your way:\n{album.artist.name} - {album.title}", reply_markup=markup)
+        query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     elif relate == "onetrack":
         album = dezclient.get_album(id)
         tracks = album.get_tracks()
@@ -181,7 +181,7 @@ def button(update: Update, context: CallbackContext):
             recursive_download=True,
             method_save=2
         )
-        query.message.reply_document(document=pathlib.Path(download.zip_path), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
+        query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
         os.remove(download.zip_path)
     elif relate == "download":
         track = dezclient.get_track(id)
