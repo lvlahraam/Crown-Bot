@@ -22,7 +22,7 @@ def start(update: Update, context: CallbackContext):
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Hi\nI'm Crown", reply_markup=markup)
+    update.message.reply_text(text="Hi\nI'm Crown", reply_markup=markup)
 
 def help(update: Update, context: CallbackContext):
     keyboard = [
@@ -33,13 +33,33 @@ def help(update: Update, context: CallbackContext):
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("You can search for music by sending a message\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr Even by using these buttons bellow", reply_markup=markup)
+    update.message.reply_text(text="You can search for music by sending a message\nOr sending the deezer url\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr Even by using these buttons bellow", reply_markup=markup)
 
 def searching(update: Update, context: CallbackContext):
     text = update.message.text
     if "/" in text:
         text = text.split("/")
-        if text[3] == "artist":
+        if "deezer" not in text[2]:
+            keyboard = [
+				[InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+				[
+					InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
+					InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+				]
+			]
+            markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text="The URL needs to be from Deezer!", reply_markup=markup)
+        elif text[3] not in ("artist", "album"):
+            keyboard = [
+				[InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+				[
+					InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
+					InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+				]
+			]
+            markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text(text="Invalid Deezer URL!", reply_markup=markup)
+        elif text[3] == "artist":
             artist = dezclient.get_artist(text[4])
             keyboard = [
                 [
@@ -48,7 +68,7 @@ def searching(update: Update, context: CallbackContext):
                 ]
             ]
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=artist.picture_medium, caption=F"{artist.name}\n{artist.nb_album}\n{artist.nb_fan}", reply_markup=markup)
+            update.message.reply_photo(photo=artist.picture_big, caption=F"{artist.name}\n{artist.nb_album}\n{artist.nb_fan}", reply_markup=markup)
         elif text[3] == "album":
             album = dezclient.get_album(text[4])
             tracks = album.get_tracks()
@@ -60,12 +80,12 @@ def searching(update: Update, context: CallbackContext):
                     keyboard.append(key)
                     counter += 1
             else:
-                key = [InlineKeyboardButton(F"{track.title} 📀", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{tracks[0].title} 📀", callback_data=F"download|{tracks[0].id}")]
                 keyboard.append(key)
             if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
             keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
             markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
+            update.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     else:
         keyboard = [
             [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=F".art {text}")],
@@ -75,7 +95,7 @@ def searching(update: Update, context: CallbackContext):
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(F"Searched: {text}", reply_markup=markup)
+        update.message.reply_text(text=F"Searched: {text}", reply_markup=markup)
 
 def button(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -125,7 +145,7 @@ def button(update: Update, context: CallbackContext):
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_media(media=InputMediaPhoto(media=artist.picture_medium))
+        query.edit_message_media(media=InputMediaPhoto(media=artist.picture_big))
         query.edit_message_caption(artist.name)
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Went to {artist.name}'s Info...")
@@ -145,7 +165,7 @@ def button(update: Update, context: CallbackContext):
         keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
         keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
         markup = InlineKeyboardMarkup(keyboard)
-        query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
+        query.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
         query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
     elif relate == "getall":
         album = dezclient.get_album(id)
@@ -155,7 +175,7 @@ def button(update: Update, context: CallbackContext):
             [InlineKeyboardButton("Full Album 📼", callback_data=F"fullalbum|{album.id}")]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.message.reply_photo(photo=album.cover_medium, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
+        query.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
     elif relate == "onetrack":
         album = dezclient.get_album(id)
         tracks = album.get_tracks()
@@ -170,7 +190,7 @@ def button(update: Update, context: CallbackContext):
                 recursive_download=True,
                 method_save=2
             )
-            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
+            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_big)
         query.message.reply_text("Done!")
     elif relate == "fullalbum":
         album = dezclient.get_album(id)
@@ -182,21 +202,22 @@ def button(update: Update, context: CallbackContext):
             quality_download="MP3_128",
             recursive_quality=True,
             recursive_download=True,
-            method_save=2
+            method_save=1
         )
-        query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_medium)
+        print(download.zip_path, pathlib.Path(download.zip_path))
+        query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_big)
     elif relate == "download":
         track = dezclient.get_track(id)
         query.answer(F"Downloading {track.title} track...")
         download = dezloader.download_trackdee(
             track.link,
             output_dir=F"./musics/",
-            quality_download="MP3_320",
+            quality_download="MP3_128",
             recursive_quality=True,
             recursive_download=True,
-            method_save=2
+            method_save=1
         )
-        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_medium)
+        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), duration=track.duration, performer=track.artist.name, title=track.title, thumb=track.album.cover_big)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
