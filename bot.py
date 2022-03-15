@@ -79,7 +79,7 @@ def searching(update: Update, context: CallbackContext):
             elif items[3] == "track":
                 track = dezapi.get_track(items[4])
                 keyboard = [
-                    [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")],
+                    [InlineKeyboardButton(F"{track['title']} 📀", callback_data=F"download|{track['id']}")],
                     [InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")]
                 ]
                 markup = InlineKeyboardMarkup(keyboard)
@@ -200,7 +200,8 @@ def button(update: Update, context: CallbackContext):
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
-    query = text.strip(".albs").strip(".trks").strip(".art").strip(".alb").strip(".trk")[2:]
+    query = text.split(" ")
+    query = query.join(" ")
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
