@@ -10,8 +10,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-dezclient = deezer.Client()
-dezloader = Login(arl=os.getenv("ARL"))
+dezlog = Login(arl=os.getenv("ARL"))
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
@@ -182,7 +181,7 @@ def button(update: Update, context: CallbackContext):
         query.answer(F"Downloading {album['title']} album...")
         query.delete_message()
         for track in tracks:
-            download = dezloader.download_trackdee(
+            download = dezlog.download_trackdee(
                 track['link'],
                 output_dir=F"./musics/",
                 quality_download="MP3_128",
@@ -196,7 +195,7 @@ def button(update: Update, context: CallbackContext):
     elif relate == "download":
         track = dezapi.get_track(id)['data']
         query.answer(F"Downloading {track['title']} track...")
-        download = dezloader.download_trackdee(
+        download = dezlog.download_trackdee(
             track['link'],
             output_dir=F"./musics/",
             quality_download="MP3_128",
