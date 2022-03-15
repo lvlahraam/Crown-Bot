@@ -51,32 +51,32 @@ def searching(update: Update, context: CallbackContext):
                 markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_text(text="Invalid Deezer URL!", reply_markup=markup)
             elif items[3] == "artist":
-                artist = dezclient.get_artist(items[4])
+                artist = dezapi.get_artist(items[4])
                 keyboard = [
                     [
-                        InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
-                        InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist.id}")
+                        InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['id']}"),
+                        InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
                     ]
                 ]
                 markup = InlineKeyboardMarkup(keyboard)
-                update.message.reply_photo(photo=artist.picture_big, caption=F"{artist.name}\n{artist.nb_album}\n{artist.nb_fan}", reply_markup=markup)
+                update.message.reply_photo(photo=artist['picture_big'], caption=F"{artist['name']}\n{artist['nb_album']}\n{artist['nb_fan']}", reply_markup=markup)
             elif items[3] == "album":
-                album = dezclient.get_album(items[4])
-                tracks = album.get_tracks()
+                album = dezapi.get_album(items[4])
+                tracks = album['tracks']['data']
                 keyboard = []
                 if len(tracks) > 1:
                     counter = 1
                     for track in tracks:
-                        key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
+                        key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
                         keyboard.append(key)
                         counter += 1
                 else:
-                    key = [InlineKeyboardButton(F"{tracks[0].title} 📀", callback_data=F"download|{tracks[0].id}")]
+                    key = [InlineKeyboardButton(F"{tracks[0]['title']} 📀", callback_data=F"download|{tracks[0]['id']}")]
                     keyboard.append(key)
-                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
-                keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
+                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
+                keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
                 markup = InlineKeyboardMarkup(keyboard)
-                update.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
+                update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
         else:
             update.message.reply_text(text=F"Invalid {'spotify' if 'spotify'in items[2] else 'deezer'} url!\n\n1. The url must either be from deezer.com or spotify.com\n2. If your given url is a playlist:\nThis Bot will not download playlists, Due to the playlist might be a day long")
     else:
@@ -96,106 +96,117 @@ def button(update: Update, context: CallbackContext):
     relate = data[0]
     id = data[1]
     if relate == "top10":
-        artist = dezclient.get_artist(id)
-        tracks = artist.get_top()[:10]
+        artist = dezapi.get_artist(id)
+        tracks = dezapi.get_artist_top_tracks(artist['id'])
         keyboard = []
         ids = []
         counter = 1
         for track in tracks:
-            if track.id in ids: pass
+            if track['id'] in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{track['album']['title']}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
                 keyboard.append(key)
-                ids.append(track.id)
+                ids.append(track['id'])
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['id']}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist.name}'s Top Tracks...")
+        query.answer(F"Here are the {artist['name']}'s Top Tracks...")
     elif relate == "albums":
-        artist = dezclient.get_artist(id)
-        albums = artist.get_albums()
+        artist = dezapi.get_artist(id)
+        albums = dezapi.get_artist_top_albums(artist['id'], limit=50)
         keyboard = []
         titles = []
         counter = 1
-        for album in albums:
-            if album.title in titles: pass
+        for album in albums['data']:
+            if album['title'] in titles: pass
             else:
-                key = [InlineKeyboardButton(F"{album.title} 📼", callback_data=F"goalbum|{album.id}")]
+                key = [InlineKeyboardButton(F"{album['title']} 📼", callback_data=F"goalbum|{album['id']}")]
                 keyboard.append(key)
-                titles.append(album.title)
+                titles.append(album['title'])
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['id']}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist.name}'s Albums...")
+        query.answer(F"Here are the {artist['name']}'s Albums...")
     elif relate == "goartist":
-        artist = dezclient.get_artist(id)
+        artist = dezapi.get_artist(id)
         keyboard = [
             [
-                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist.id}"),
-                InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist.id}")
+                InlineKeyboardButton("Top 10 Tracks 🌟", callback_data=F"top10|{artist['id']}"),
+                InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_media(media=InputMediaPhoto(media=artist.picture_big))
-        query.edit_message_caption(artist.name)
+        query.edit_message_media(media=InputMediaPhoto(media=artist['picture_big']))
+        query.edit_message_caption(artist['name'])
         query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Went to {artist.name}'s Info...")
+        query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
-        album = dezclient.get_album(id)
-        tracks = album.get_tracks()
+        album = dezapi.get_album(id)
+        tracks = album['tracks']['data']
         keyboard = []
         ids = []
         counter = 1
         for track in tracks:
-            if track.id in ids: pass
+            if track['id'] in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{counter}. {track.title} 📀", callback_data=F"download|{track.id}")]
+                key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
                 keyboard.append(key)
-                ids.append(track.id)
+                ids.append(track['id'])
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album.id}")])
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album.artist.id}")])
+        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
+        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = InlineKeyboardMarkup(keyboard)
-        query.message.reply_photo(photo=album.cover_big, caption=F"{album.artist.name} - {album.title}", reply_markup=markup)
-        query.answer(F"Went to {album.artist.name}'s {album.title} Album...")
+        query.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+        query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
-        album = dezclient.get_album(id)
-        tracks = album.get_tracks()
-        query.answer(F"Downloading {album.title} album...")
+        album = dezapi.get_album(id)
+        tracks = album['tracks']['data']
+        query.answer(F"Downloading {album['title']} album...")
         query.delete_message()
         for track in tracks:
             download = dezloader.download_trackdee(
-                track.link,
+                track['link'],
                 output_dir=F"./musics/",
                 quality_download="MP3_128",
                 recursive_quality=True,
                 recursive_download=True,
                 method_save=1
             )
-            query.answer(F"Downloaded {track.title} track...")
-            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=30)
+            query.answer(F"Downloaded {track['title']} track...")
+            query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
         query.message.reply_text("Done!")
     elif relate == "download":
-        track = dezclient.get_track(id)
-        query.answer(F"Downloading {track.title} track...")
+        track = dezapi.get_track(id)['data']
+        query.answer(F"Downloading {track['title']} track...")
         download = dezloader.download_trackdee(
-            track.link,
+            track['link'],
             output_dir=F"./musics/",
             quality_download="MP3_128",
             recursive_quality=True,
             recursive_download=True,
             method_save=1
         )
-        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track.artist} - {track.title}", title=track.title, performer=track.artist.name, duration=track.duration, thumb=track.album.cover_big, timeout=30)
+        query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
     query = text.strip(".albs").strip(".art").strip(".alb").strip(".trk")
     if query is None: return
-    if text.startswith(".art"):
+    if text.startswith(".albs"):
+        if query.isdigit():
+            search = dezapi.get_artist_top_albums(query, limit=50)
+        else:
+            item = result = InlineQueryResultArticle(
+                id="BADALBUMSSEARCH",
+                title="Not an ID!",
+                description="Query must be the artist's ID",
+                input_message_content=InputTextMessageContent("/help")
+            )
+            return update.inline_query.answer(results=[item])
+    elif text.startswith(".art"):
         search = dezapi.search_artist(query=query)
     elif text.startswith(".alb"):
         search = dezapi.search_album(query=query)
@@ -216,7 +227,7 @@ def inline(update: Update, context: CallbackContext):
             add = data['title']
         elif data['type'] == "track":
             name = data['title']
-            description = F"{data['arist']['name']}\n{data['album']['title']}"
+            description = F"{data['artist']['name']}\n{data['album']['title']}"
             thumbnail = data['album']['cover']
             add = data['title']
         if not add in added:
