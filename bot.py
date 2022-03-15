@@ -204,7 +204,7 @@ def button(update: Update, context: CallbackContext):
             recursive_download=True,
             method_save=1
         )
-        print(download.zip_path, pathlib.Path(download.zip_path))
+        print(download.zip_path)
         # query.message.reply_document(document=pathlib.Path(download.zip_path).read_bytes(), caption=F"{album.artist.name} - {album.title}", thumb=album.cover_big)
     elif relate == "download":
         track = dezclient.get_track(id)
