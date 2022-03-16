@@ -55,7 +55,7 @@ def searching(update: Update, context: CallbackContext):
                 artist = dezapi.get_artist(items[4])
                 keyboard = [
                     [
-                        InlineKeyboardButton("Top 10 Tracks 🌟", switch_inline_query_current_chat=F".trks {artist['id']}"),
+                        InlineKeyboardButton("Tracks 📀", switch_inline_query_current_chat=F".trks {artist['id']}"),
                         InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
                     ]
                 ]
@@ -107,41 +107,7 @@ def button(update: Update, context: CallbackContext):
     data = query.data.split("|")
     relate = data[0]
     id = data[1]
-    if relate == "top10":
-        artist = dezapi.get_artist(id)
-        tracks = dezapi.get_artist_top_tracks(artist['id'])
-        keyboard = []
-        ids = []
-        counter = 1
-        for track in tracks:
-            if track['id'] in ids: pass
-            else:
-                key = [InlineKeyboardButton(F"{track['album']['title']}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
-                keyboard.append(key)
-                ids.append(track['id'])
-                counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['id']}")])
-        markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['name']}'s Top Tracks...")
-    elif relate == "albums":
-        artist = dezapi.get_artist(id)
-        albums = dezapi.get_artist_top_albums(artist['id'], limit=50)
-        keyboard = []
-        titles = []
-        counter = 1
-        for album in albums['data']:
-            if album['title'] in titles: pass
-            else:
-                key = [InlineKeyboardButton(F"{album['title']} 📼", callback_data=F"goalbum|{album['id']}")]
-                keyboard.append(key)
-                titles.append(album['title'])
-                counter += 1
-        keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{artist['id']}")])
-        markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_reply_markup(reply_markup=markup)
-        query.answer(F"Here are the {artist['name']}'s Albums...")
-    elif relate == "lyrics":
+    if relate == "lyrics":
         track = dezapi.get_track(id)
         lyrics = dezgw.get_lyric(id)
         wraps = textwrap.wrap(lyrics['LYRICS_TEXT'], width=constants.MAX_MESSAGE_LENGTH)
@@ -217,7 +183,7 @@ def inline(update: Update, context: CallbackContext):
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
-            search = dezapi.get_artist_top_albums(query, limit=50)
+            search = dezapi.get_artist_top_albums(query, limit=25)
         else:
             item = result = InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
@@ -228,7 +194,7 @@ def inline(update: Update, context: CallbackContext):
             return update.inline_query.answer(results=[item])
     elif text.startswith(".trks"):
         if query.isdigit():
-            search = dezapi.get_artist_top_tracks(query, limit=10)
+            search = dezapi.get_artist_top_tracks(query, limit=25)
         else:
             item = result = InlineQueryResultArticle(
                 id="BADTRACKSSEARCH",
