@@ -74,7 +74,7 @@ def searching(update: Update, context: CallbackContext):
                 else:
                     key = [InlineKeyboardButton(F"{tracks[0]['title']} 💿", callback_data=F"download|{tracks[0]['id']}")]
                     keyboard.append(key)
-                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
+                if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
                 keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
                 markup = InlineKeyboardMarkup(keyboard)
                 update.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
@@ -143,7 +143,7 @@ def button(update: Update, context: CallbackContext):
                 keyboard.append(key)
                 ids.append(track['id'])
                 counter += 1
-        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
+        keyboard.append([InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = InlineKeyboardMarkup(keyboard)
         query.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
@@ -152,9 +152,8 @@ def button(update: Update, context: CallbackContext):
         album = dezapi.get_album(id)
         tracks = album['tracks']['data']
         query.answer(F"Downloading {album['title']} album...")
-        query.delete_message()
         for track in tracks:
-            queue = query.message.reply(text=F"Downloading {track['title']} track...")
+            queue = query.message.reply_text(text=F"Downloading {track['title']} track...")
             download = dezlog.download_trackdee(
                 track['link'],
                 output_dir=F"./musics/",
