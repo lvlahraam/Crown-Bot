@@ -86,7 +86,7 @@ def searching(update: Update, context: CallbackContext):
                         InlineKeyboardButton(F"Get The Lyrics 📓", callback_data=F"lyrics|{track['id']}")
                     ],
                     [
-                        InlineKeyboardButton(F"Go TO Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
+                        InlineKeyboardButton(F"Go To Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
                         InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
                     ]
                 ]
@@ -181,8 +181,7 @@ def button(update: Update, context: CallbackContext):
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
     if text is None or not text.startswith("."): return
-    query = text.split(" ")
-    query = " ".join(query[1:])
+    query = " ".join(text.split(" ")[1:])
     if query is None: return
     if text.startswith(".albs"):
         if query.isdigit():
@@ -219,18 +218,18 @@ def inline(update: Update, context: CallbackContext):
             name = data['name']
             description = F"{data['nb_album']}\n{data['nb_fan']}"
             thumbnail = data['picture']
-            add = data['name']
+            add = data['id']
         elif data['type'] == "album":
             name = data['title']
             artist = data.get("artist") or dezapi.get_artist(query)
             description = F"{artist['name']}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
             thumbnail = data['cover']
-            add = data['title']
+            add = data['id']
         elif data['type'] == "track":
             name = data['title']
             description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
             thumbnail = data['album']['cover']
-            add = data['title']
+            add = data['id']
         if not add in added:
             result = InlineQueryResultArticle(
                 id=data['id'],
