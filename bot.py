@@ -152,8 +152,9 @@ def button(update: Update, context: CallbackContext):
         album = dezapi.get_album(id)
         tracks = album['tracks']['data']
         query.answer(F"Downloading {album['title']} album...")
+        counter = 1
         for track in tracks:
-            queue = query.message.reply_text(text=F"Downloading {track['title']} track...")
+            queue = query.message.reply_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
             download = dezlog.download_trackdee(
                 track['link'],
                 output_dir=F"./musics/",
@@ -165,6 +166,7 @@ def button(update: Update, context: CallbackContext):
             queue.delete()
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=album['cover_big'], timeout=30)
             os.remove(download.song_path)
+            counter += 1
         query.message.reply_text("Done!")
     elif relate == "download":
         track = dezapi.get_track(id)
