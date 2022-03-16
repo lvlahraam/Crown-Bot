@@ -1,8 +1,8 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
-import logging, os, pathlib
+import logging, os, pathlib, textwrap
 from deezloader.deezloader import DeeLogin, API, API_GW
-from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
+from telegram import constants, Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
 
 logging.basicConfig(
@@ -144,7 +144,9 @@ def button(update: Update, context: CallbackContext):
     elif relate == "lyrics":
         track = dezapi.get_track(id)
         lyrics = dezgw.get_lyric(id)
-        query.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['artist']['name']} - {track['title']}\n\n{lyrics['LYRICS_TEXT']}")
+        wraps = textwrap.wrap(lyrics['LYRICS_TEXT'], width=constants.MAX_MESSAGE_LENGTH)
+        for wrapped in wraps:
+            query.message.reply_text(text=wrapped)
         query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = dezapi.get_artist(id)
@@ -229,7 +231,7 @@ def inline(update: Update, context: CallbackContext):
             search = dezapi.get_artist_top_tracks(query, limit=10)
         else:
             item = result = InlineQueryResultArticle(
-                id="BADALBUMSSEARCH",
+                id="BADTRACKSSEARCH",
                 title="Not an ID!",
                 description="Query must be the artist's ID",
                 input_message_content=InputTextMessageContent("/help")
@@ -254,12 +256,13 @@ def inline(update: Update, context: CallbackContext):
             if not data.get("artist"): artist = dezapi.get_artist(query)['name']
             else: artist = data['artist']['name']
             nb_tracks = data.get("nb_tracks") or ''
-            description = F"{artist}\n{nb_tracks}"
+            release_date = data.get("release_date") or ''
+            description = F"{artist}\n{nb_tracks}\n{release_date}"
             thumbnail = data['cover']
             add = data['title']
         elif data['type'] == "track":
             name = data['title']
-            description = F"{data['artist']['name']}\n{data['album']['title']}"
+            description = F"{data['artist']['name']}\n{data['album']['title']}\n{data['release_date']}"
             thumbnail = data['album']['cover']
             add = data['title']
         if not add in added:
@@ -274,7 +277,7 @@ def inline(update: Update, context: CallbackContext):
             results.append(result)
             added.append(add)
         else: pass
-    update.inline_query.answer(results)
+    update.inline_query.answer(results, timeout=30)
 
 def error(update: Update, context: CallbackContext):
     logger.warning(F"Update: {update}\n\nCaused: {context.error}")
