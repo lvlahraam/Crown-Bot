@@ -1,7 +1,7 @@
 # NOTE: THIS BOT DOES NOT DOWNLOAD ANY MUSIC ON THE DIRECTORY
 
 import logging, os, pathlib
-from deezloader.deezloader import DeeLogin as Login, API as dezapi, API_GW
+from deezloader.deezloader import DeeLogin, API, API_GW
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, CallbackContext
 
@@ -10,7 +10,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-dezlog = Login(arl=os.getenv("ARL"))
+dezlog = DeeLogin(arl=os.getenv("ARL"))
+dezapi = API()
 dezgw = API_GW(arl=os.getenv("ARL"))
 
 def start(update: Update, context: CallbackContext):
@@ -141,10 +142,9 @@ def button(update: Update, context: CallbackContext):
         query.edit_message_reply_markup(reply_markup=markup)
         query.answer(F"Here are the {artist['name']}'s Albums...")
     elif relate == "lyrics":
-        track = dezapi.get_track(query)
-        lyrics = dezgw.get_lyric(query)
+        track = dezapi.get_track(id)
+        lyrics = dezgw.get_lyric(id)
         query.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['album']['artist']['name']} - {track['title']}\n\n{lyrics['LYRICS_TEXT']}")
-        query.message.reply_photo()
         query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = dezapi.get_artist(id)
