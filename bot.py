@@ -251,9 +251,10 @@ def inline(update: Update, context: CallbackContext):
             add = data['name']
         elif data['type'] == "album":
             name = data['title']
-            if not data.get("artist"): artist = dezapi.get_artist(query)
-            else: artist = data['artist']
-            description = F"{artist['name']}\n{data['nb_tracks']}"
+            if not data.get("artist"): artist = dezapi.get_artist(query)['name']
+            else: artist = data['artist']['name']
+            nb_tracks = data.get("nb_tracks") or ''
+            description = F"{artist}\n{nb_tracks}"
             thumbnail = data['cover']
             add = data['title']
         elif data['type'] == "track":
