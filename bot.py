@@ -146,7 +146,7 @@ def button(update: Update, context: CallbackContext):
         lyrics = dezgw.get_lyric(id)
         wraps = textwrap.wrap(lyrics['LYRICS_TEXT'], width=constants.MAX_MESSAGE_LENGTH)
         for wrapped in wraps:
-            query.message.reply_text(text=wrapped)
+            query.message.reply_text(text=wrapped.replace("  ", "\n"))
         query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = dezapi.get_artist(id)
@@ -197,7 +197,7 @@ def button(update: Update, context: CallbackContext):
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
         query.message.reply_text("Done!")
     elif relate == "download":
-        track = dezapi.get_track(id)['data']
+        track = dezapi.get_track(id)
         query.answer(F"Downloading {track['title']} track...")
         download = dezlog.download_trackdee(
             track['link'],
