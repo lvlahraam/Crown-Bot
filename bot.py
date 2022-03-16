@@ -154,6 +154,7 @@ def button(update: Update, context: CallbackContext):
         query.answer(F"Downloading {album['title']} album...")
         query.delete_message()
         for track in tracks:
+            queue = query.message.reply(text=F"Downloading {track['title']} track...")
             download = dezlog.download_trackdee(
                 track['link'],
                 output_dir=F"./musics/",
@@ -162,7 +163,7 @@ def button(update: Update, context: CallbackContext):
                 recursive_download=True,
                 method_save=1
             )
-            query.answer(F"Downloaded {track['title']} track...")
+            queue.delete()
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=album['cover_big'], timeout=30)
             os.remove(download.song_path)
         query.message.reply_text("Done!")
