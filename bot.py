@@ -164,6 +164,7 @@ def button(update: Update, context: CallbackContext):
             )
             query.answer(F"Downloaded {track['title']} track...")
             query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
+            os.remove(download.song_path)
         query.message.reply_text("Done!")
     elif relate == "download":
         track = dezapi.get_track(id)
@@ -177,6 +178,7 @@ def button(update: Update, context: CallbackContext):
             method_save=1
         )
         query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
+        os.remove(download.song_path)
 
 def inline(update: Update, context: CallbackContext):
     text = update.inline_query.query
@@ -242,7 +244,7 @@ def inline(update: Update, context: CallbackContext):
             results.append(result)
             added.append(add)
         else: pass
-    update.inline_query.answer(results, timeout=30)
+    update.inline_query.answer(results)
 
 def error(update: Update, context: CallbackContext):
     logger.warning(F"Update: {update}\n\nCaused: {context.error}")
