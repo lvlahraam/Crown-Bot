@@ -18,8 +18,8 @@ def start(update: Update, context: CallbackContext):
     keyboard = [
         [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
-            InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
-            InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+            InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=".alb "),
+            InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=".trk ")
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
@@ -29,8 +29,8 @@ def help(update: Update, context: CallbackContext):
     keyboard = [
         [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
-            InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
-            InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+            InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=".alb "),
+            InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=".trk ")
         ]
     ]
     markup = InlineKeyboardMarkup(keyboard)
@@ -45,8 +45,8 @@ def searching(update: Update, context: CallbackContext):
                 keyboard = [
                     [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
                     [
-                        InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=".alb "),
-                        InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=".trk ")
+                        InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=".alb "),
+                        InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=".trk ")
                     ]
                 ]
                 markup = InlineKeyboardMarkup(keyboard)
@@ -55,7 +55,7 @@ def searching(update: Update, context: CallbackContext):
                 artist = dezapi.get_artist(items[4])
                 keyboard = [
                     [
-                        InlineKeyboardButton("Tracks 📀", switch_inline_query_current_chat=F".trks {artist['id']}"),
+                        InlineKeyboardButton("Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
                         InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
                     ]
                 ]
@@ -68,11 +68,11 @@ def searching(update: Update, context: CallbackContext):
                 if len(tracks) > 1:
                     counter = 1
                     for track in tracks:
-                        key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
+                        key = [InlineKeyboardButton(F"{counter}. {track['title']} 💿", callback_data=F"download|{track['id']}")]
                         keyboard.append(key)
                         counter += 1
                 else:
-                    key = [InlineKeyboardButton(F"{tracks[0]['title']} 📀", callback_data=F"download|{tracks[0]['id']}")]
+                    key = [InlineKeyboardButton(F"{tracks[0]['title']} 💿", callback_data=F"download|{tracks[0]['id']}")]
                     keyboard.append(key)
                 if len(tracks) > 1: keyboard.append([InlineKeyboardButton(F"Get All Tracks 💣", callback_data=F"getall|{album['id']}")])
                 keyboard.append([InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
@@ -81,9 +81,12 @@ def searching(update: Update, context: CallbackContext):
             elif items[3] == "track":
                 track = dezapi.get_track(items[4])
                 keyboard = [
-                    [InlineKeyboardButton(F"{track['title']} 📀", callback_data=F"download|{track['id']}")],
                     [
-                        InlineKeyboardButton(F"Get The Lyrics 📓", callback_data=F"lyrics|{track['id']}"),
+                        InlineKeyboardButton(F"{track['title']} 💿", callback_data=F"download|{track['id']}"),
+                        InlineKeyboardButton(F"Get The Lyrics 📓", callback_data=F"lyrics|{track['id']}")
+                    ],
+                    [
+                        InlineKeyboardButton(F"Go TO Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
                         InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
                     ]
                 ]
@@ -95,8 +98,8 @@ def searching(update: Update, context: CallbackContext):
         keyboard = [
             [InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=F".art {text}")],
             [
-                InlineKeyboardButton("Search Album 📀", switch_inline_query_current_chat=F".alb {text}"),
-                InlineKeyboardButton("Search Track 📼", switch_inline_query_current_chat=F".trk {text}")
+                InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=F".alb {text}"),
+                InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=F".trk {text}")
             ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
@@ -118,7 +121,7 @@ def button(update: Update, context: CallbackContext):
         artist = dezapi.get_artist(id)
         keyboard = [
             [
-                InlineKeyboardButton("Top 10 Tracks 🌟", switch_inline_query_current_chat=F".trks {artist['id']}"),
+                InlineKeyboardButton("Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
                 InlineKeyboardButton("Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
             ]
         ]
@@ -136,7 +139,7 @@ def button(update: Update, context: CallbackContext):
         for track in tracks:
             if track['id'] in ids: pass
             else:
-                key = [InlineKeyboardButton(F"{counter}. {track['title']} 📀", callback_data=F"download|{track['id']}")]
+                key = [InlineKeyboardButton(F"{counter}. {track['title']} 💿", callback_data=F"download|{track['id']}")]
                 keyboard.append(key)
                 ids.append(track['id'])
                 counter += 1
