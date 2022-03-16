@@ -144,7 +144,7 @@ def button(update: Update, context: CallbackContext):
     elif relate == "lyrics":
         track = dezapi.get_track(id)
         lyrics = dezgw.get_lyric(id)
-        query.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['album']['artist']['name']} - {track['title']}\n\n{lyrics['LYRICS_TEXT']}")
+        query.message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['artist']['name']} - {track['title']}\n\n{lyrics['LYRICS_TEXT']}")
         query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = dezapi.get_artist(id)
@@ -251,14 +251,14 @@ def inline(update: Update, context: CallbackContext):
             add = data['name']
         elif data['type'] == "album":
             name = data['title']
-            description = F"{data['artist']['name']}\n{data['nb_tracks']}"
+            if not data.get("artist"): artist = dezapi.get_artist(query)
+            else: artist = data['artist']
+            description = F"{artist['name']}\n{data['nb_tracks']}"
             thumbnail = data['cover']
             add = data['title']
         elif data['type'] == "track":
             name = data['title']
-            if not data.get("artist"): artist = dezapi.get_artist(query)
-            else: artist = data['artist']
-            description = F"{artist['name']}\n{data['album']['title']}"
+            description = F"{data['artist']['name']}\n{data['album']['title']}"
             thumbnail = data['album']['cover']
             add = data['title']
         if not add in added:
