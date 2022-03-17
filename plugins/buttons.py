@@ -67,7 +67,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=album['cover_big'], timeout=30)
+                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=album['cover'])
                 os.remove(download.song_path)
                 counter += 1
             await query.message.reply_text("Done!")
@@ -82,5 +82,5 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), filename=F"{track['artist']['name']} - {track['title']}", title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], timeout=30)
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover'], )
         os.remove(download.song_path)
