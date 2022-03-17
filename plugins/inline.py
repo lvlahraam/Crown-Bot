@@ -5,7 +5,7 @@ from pyrogram import Client, filters, types
 @Client.on_inline_query()
 async def inline(client:Client, inline_query:types.InlineQuery):
     text = inline_query.query
-    if text is None or string.ascii_letters not in text or string.digits not in text or not text.startswith("."): return
+    if text is None or not text.startswith("."): return
     query = " ".join(text.split(" ")[1:])
     if query is None or string.ascii_letters not in query or string.digits not in query: return
     results = []
