@@ -1,5 +1,4 @@
 import textwrap, pathlib, os,  wget
-from aiohttp import ClientSession
 from pyrogram import Client, filters, types
 
 @Client.on_callback_query()
