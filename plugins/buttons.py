@@ -48,13 +48,14 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
         if downloading:
+            await query.answer("You have to wait...")
             await query.message.reply_text(text=F"You are currently downloading:\n{downloading}\nPlease wait for it to complete!")
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
-            queue = await query.message.reply_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
+            queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
             counter = 1
             for track in tracks:
                 download = client.dezlog.download_trackdee(
