@@ -7,7 +7,7 @@ async def inline(client:Client, inline_query:types.InlineQuery):
     text = inline_query.query
     if text is None or not text.startswith("."): return
     query = " ".join(text.split(" ")[1:])
-    if query is None or string.ascii_letters not in query or string.digits not in query: return
+    if query is None: return
     results = []
     if text.startswith(".albs"):
         if query.isdigit():
