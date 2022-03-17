@@ -1,16 +1,14 @@
 import textwrap, pathlib, os,  io, aiohttp
 from pyrogram import Client, filters, types
 
-async def image(url):
+async def image(filename, url):
     async with aiohttp.ClientSession() as ses:
         async with ses.get(url) as r:
-            if r.status in range(200, 299):
-                img = io.BytesIO(await r.read())
-                b = img.getvalue()
-                print(b)
-            else:
-                print(f'Something went wrong. Response: {r.status}')
-            return b
+            img = io.BytesIO(await r.read())
+            b = img.getvalue()
+            with open(F"{filename}.png", "wb") as f:
+                f.write(img.getbuffer())
+            return f
 
 @Client.on_callback_query()
 async def buttons(client:Client, callback_query:types.CallbackQuery):
@@ -62,7 +60,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            img = await image(album['cover_big'])
+            img = await image(album['title'], album['cover_big'])
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
             queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
@@ -82,9 +80,10 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                 counter += 1
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
+            os.remove(img)
     elif relate == "download":
         track = client.dezapi.get_track(id)
-        img = await image(track['album']['cover_big'])
+        img = await image(track['album']['title'], track['album']['cover_big'])
         await query.answer(F"Downloading {track['title']} track...")
         download = client.dezlog.download_trackdee(
             track['link'],
@@ -96,3 +95,4 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         )
         await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=img)
         os.remove(download.song_path)
+        os.remove(img)
