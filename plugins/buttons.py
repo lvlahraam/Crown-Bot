@@ -1,4 +1,4 @@
-import textwrap, pathlib, os,  wget
+import textwrap, pathlib, os,  io
 from pyrogram import Client, filters, types
 
 @Client.on_callback_query()
@@ -51,7 +51,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            image = wget.download(track['album']['cover_big'])
+            image = io.BytesIO(album['cover_big'])
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
             queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
@@ -66,12 +66,11 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=F"./{image}")
+                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=image)
                 os.remove(download.song_path)
                 counter += 1
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
-            os.remove(F"./{image}")
     elif relate == "download":
         track = client.dezapi.get_track(id)
         await query.answer(F"Downloading {track['title']} track...")
@@ -83,7 +82,6 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        image = wget.download(track['album']['cover_big'])
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./{image}")
+        image = io.BytesIO(track['album']['cover_big'])
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=image)
         os.remove(download.song_path)
-        os.remove(F"./{image}")
