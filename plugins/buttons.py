@@ -2,7 +2,6 @@ import textwrap, pathlib, os,  io, aiohttp
 from pyrogram import Client, filters, types
 
 async def image(url):
-    url = url
     async with aiohttp.ClientSession() as ses:
         async with ses.get(url) as r:
             if r.status in range(200, 299):
