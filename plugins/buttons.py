@@ -1,4 +1,5 @@
-import textwrap, pathlib, os
+import textwrap, pathlib, os, io
+from aiohttp import ClientSession
 from pyrogram import Client, filters, types
 
 @Client.on_callback_query()
@@ -23,9 +24,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.edit_message_media(media=types.InputMediaPhoto(media=artist['picture_big']))
-        await query.edit_message_caption(artist['name'])
-        await query.edit_message_reply_markup(reply_markup=markup)
+        await query.edit_message_media(media=types.InputMedia(media=artist['picture_big'], caption=artist['name']), reply_markup=markup)
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.dezapi.get_album(id)
@@ -43,7 +42,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         keyboard.append([types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+        await query.edit_message_media(photo=types.InputMedia(media=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}"), reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
@@ -53,6 +52,10 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
+            session = await client.aiosession.get(track['album']['cover'])
+            image = io.BytesIO(await session.read())
+            with open(F"./pictures/{album['artist']['name']} - {album['title']}.png", "x") as f:
+                f.write(image.getbuffer())
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
             queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
@@ -67,10 +70,12 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=album['cover_big'])
+                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=F"./pictures/{album['artist']['name']} - {album['title']}.png")
                 os.remove(download.song_path)
                 counter += 1
             await query.message.reply_text("Done!")
+            del client.downloads[query.message.from_user.id]
+            os.remove(F"./pictures/{album['artist']['name']} - {album['title']}.png")
     elif relate == "download":
         track = client.dezapi.get_track(id)
         await query.answer(F"Downloading {track['title']} track...")
@@ -82,5 +87,10 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=track['album']['cover_big'], )
+        session = await client.aiosession.get(track['album']['cover'])
+        image = io.BytesIO(await session.read())
+        with open(F"./pictures/{track['artist']['name']} - {track['album']}.png", "x") as f:
+            f.write(image.getbuffer())
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./pictures/{track['artist']['name']} - {track['album']}.png")
         os.remove(download.song_path)
+        os.remove(F"./pictures/{track['artist']['name']} - {track['album']['title']}.png")

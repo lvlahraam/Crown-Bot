@@ -1,4 +1,4 @@
-import logging, os
+import asyncio, logging, os, aiohttp
 from deezloader.deezloader import DeeLogin, API, API_GW
 import pyrogram
 
@@ -14,5 +14,12 @@ app.dezapi = API()
 app.dezgw = API_GW(arl=os.getenv("ARL"))
 
 app.downloads = {}
+
+async def create_aiohttp_session():
+    app.aiosession = aiohttp.ClientSession()
+    print("Created a AioHttp Session")
+
+
+app.loop.run_until_complete(create_aiohttp_session())
 
 app.run()
