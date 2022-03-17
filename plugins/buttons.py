@@ -89,8 +89,8 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         )
         session = await client.aiosession.get(track['album']['cover'])
         image = io.BytesIO(await session.read())
-        with open(F"./pictures/{track['artist']['name']} - {track['album']}.png", "x") as f:
+        with open(F"./pictures/{track['artist']['name']} - {track['album']['title']}.png", "x") as f:
             f.write(image.getbuffer())
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./pictures/{track['artist']['name']} - {track['album']}.png")
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./pictures/{track['artist']['name']} - {track['album']['title']}.png")
         os.remove(download.song_path)
         os.remove(F"./pictures/{track['artist']['name']} - {track['album']['title']}.png")
