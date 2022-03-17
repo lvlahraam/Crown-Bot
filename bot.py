@@ -7,7 +7,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = pyrogram.Client(session_name="robot", bot_token=os.getenv("TOKEN"), plugins=dict(root="plugins")) 
+app = pyrogram.Client(session_name="crownmusicbot", bot_token=os.getenv("TOKEN"), api_id=os.getenv("API_ID"), api_hash=os.getenv("API_HASH"), plugins=dict(root="plugins")) 
 
 app.dezlog = DeeLogin(arl=os.getenv("ARL"))
 app.dezapi = API()
