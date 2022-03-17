@@ -1,4 +1,4 @@
-import logging, os
+import logging, os, requests, shutil
 from deezloader.deezloader import DeeLogin, API, API_GW
 import pyrogram
 
@@ -14,5 +14,11 @@ app.dezapi = API()
 app.dezgw = API_GW(arl=os.getenv("ARL"))
 
 app.downloads = {}
+
+def image(name, url):
+    response = requests.get(url, stream=True)
+    with open(F"{name}.jpeg", 'wb') as out_file:
+        shutil.copyfileobj(response.raw, out_file)
+app.image = image
 
 app.run()
