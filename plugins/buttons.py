@@ -20,7 +20,6 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         await query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = client.dezapi.get_artist(id)
-        Client.image(artist['name'], album['picture_big'])
         keyboard = [
             [
                 types.InlineKeyboardButton("Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
@@ -28,12 +27,11 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=F"./{artist['name']}", caption=artist['name'], reply_markup=markup)
+        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=artist['picture_big'], caption=artist['name'], reply_markup=markup)
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.dezapi.get_album(id)
         tracks = album['tracks']['data']
-        Client.image(album['title'], album['cover_big'])
         keyboard = []
         ids = []
         counter = 1
@@ -47,7 +45,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         keyboard.append([types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = types.InlineKeyboardMarkup(keyboard)
-        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=F"./{album['title']}", caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
@@ -57,10 +55,9 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            Client.image(album['title'], album['cover_big'])
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
-            queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
+            queue = await query.message.reply_text(text=F"Downloading...")
             counter = 1
             for track in tracks:
                 download = client.dezlog.download_trackdee(
@@ -71,17 +68,15 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     recursive_download=True,
                     method_save=1
                 )
-                await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./{album['title']}.jpeg")
+                await Client.progress(queue, counter, len(tracks))
+                await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
-            os.remove(F"./{album['title']}")
     elif relate == "download":
         track = client.dezapi.get_track(id)
-        Client.image(track['title'], track['album']['cover_big'])
         await query.answer(F"Downloading {track['title']} track...")
         download = client.dezlog.download_trackdee(
             track['link'],
@@ -91,6 +86,5 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./{track['title']}.jpeg")
+        await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
         os.remove(download.song_path)
-        os.remove(F"./{track['title']}.jpeg")
