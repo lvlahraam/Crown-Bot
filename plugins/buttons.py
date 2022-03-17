@@ -25,6 +25,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         await query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = client.dezapi.get_artist(id)
+        img = await image(artist['name'], artist['picture_big'])
         keyboard = [
             [
                 types.InlineKeyboardButton("Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
@@ -32,11 +33,12 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.edit_message_media(media=types.InputMedia(media=artist['picture_big'], caption=artist['name']), reply_markup=markup)
+        await query.edit_message_media(media=types.InputMedia(media=F"./{artist['name']}.png", caption=artist['name']), reply_markup=markup)
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.dezapi.get_album(id)
         tracks = album['tracks']['data']
+        img = await image(album['title'], album['cover_big'])
         keyboard = []
         ids = []
         counter = 1
@@ -50,7 +52,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         keyboard.append([types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.edit_message_media(photo=types.InputMedia(media=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}"), reply_markup=markup)
+        await query.edit_message_media(media=types.InputMedia(media=F"./{album['title']}.png", caption=F"{album['artist']['name']} - {album['title']}"), reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
