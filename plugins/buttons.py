@@ -1,4 +1,4 @@
-import textwrap, pathlib, os, io
+import textwrap, pathlib, os,  wget
 from aiohttp import ClientSession
 from pyrogram import Client, filters, types
 
@@ -52,10 +52,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            session = await client.aiosession.get(track['album']['cover'])
-            image = io.BytesIO(await session.read())
-            with open(F"./pictures/{album['artist']['name']} - {album['title']}.png", "x") as f:
-                f.write(image.getbuffer())
+            image = wget.download(track['album']['cover_big'])
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
             queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
@@ -70,12 +67,12 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=F"./pictures/{album['artist']['name']} - {album['title']}.png")
+                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=F"./{image}")
                 os.remove(download.song_path)
                 counter += 1
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
-            os.remove(F"./pictures/{album['artist']['name']} - {album['title']}.png")
+            os.remove(F"./{image}")
     elif relate == "download":
         track = client.dezapi.get_track(id)
         await query.answer(F"Downloading {track['title']} track...")
@@ -87,10 +84,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        session = await client.aiosession.get(track['album']['cover'])
-        image = io.BytesIO(await session.read())
-        with open(F"./pictures/{track['artist']['name']} - {track['album']['title']}.png", "x") as f:
-            f.write(image.getbuffer())
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./pictures/{track['artist']['name']} - {track['album']['title']}.png")
+        image = wget.download(track['album']['cover_big'])
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./{image}")
         os.remove(download.song_path)
-        os.remove(F"./pictures/{track['artist']['name']} - {track['album']['title']}.png")
+        os.remove(F"./{image}")
