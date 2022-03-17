@@ -75,12 +75,11 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=img)
+                await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=album['artist']['name'], duration=track['duration'])
                 os.remove(download.song_path)
                 counter += 1
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
-            os.remove(img)
     elif relate == "download":
         track = client.dezapi.get_track(id)
         img = await image(track['album']['title'], track['album']['cover_big'])
@@ -93,6 +92,5 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=img)
+        await query.message.reply_audio(audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
         os.remove(download.song_path)
-        os.remove(img)
