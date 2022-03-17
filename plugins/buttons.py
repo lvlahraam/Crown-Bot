@@ -6,7 +6,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
     query = callback_query
     data = query.data.split("|")
     relate = data[0]
-    id = data[0]
+    id = data[1]
     if relate == "lyrics":
         track = client.dezapi.get_track(id)
         lyrics = client.dezgw.get_lyric(id)
