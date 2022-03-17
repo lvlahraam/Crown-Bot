@@ -1,14 +1,9 @@
-import textwrap, pathlib, os,  io, aiohttp
+import textwrap, pathlib, os,  io, requests
 from pyrogram import Client, filters, types
 
-async def image(filename, url):
-    async with aiohttp.ClientSession() as ses:
-        async with ses.get(url) as r:
-            img = io.BytesIO(await r.read())
-            b = img.getvalue()
-            with open(F"{filename}.png", "wb") as f:
-                f.write(img.getbuffer())
-            return f
+def image(url):
+    r = requests.get(url, stream=True, )
+    return url.split("/")[-1]
 
 @Client.on_callback_query()
 async def buttons(client:Client, callback_query:types.CallbackQuery):
@@ -25,7 +20,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         await query.answer(F"Here are the lyrics for {track['title']} track...")
     elif relate == "goartist":
         artist = client.dezapi.get_artist(id)
-        img = await image(artist['name'], artist['picture_big'])
+        img = image(artist['picture_big'])
         keyboard = [
             [
                 types.InlineKeyboardButton("Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
@@ -33,12 +28,12 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.edit_message_media(media=types.InputMedia(media=F"./{artist['name']}.png", caption=artist['name']), reply_markup=markup)
+        await query.edit_message_media(media=types.InputMedia(media=F"./plugins/{img}", caption=artist['name']), reply_markup=markup)
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.dezapi.get_album(id)
         tracks = album['tracks']['data']
-        img = await image(album['title'], album['cover_big'])
+        img = image(album['cover_big'])
         keyboard = []
         ids = []
         counter = 1
@@ -52,7 +47,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         keyboard.append([types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = types.InlineKeyboardMarkup(keyboard)
-        await query.edit_message_media(media=types.InputMedia(media=F"./{album['title']}.png", caption=F"{album['artist']['name']} - {album['title']}"), reply_markup=markup)
+        await query.edit_message_media(media=types.InputMedia(media=F"./plugins/{img}", caption=F"{album['artist']['name']} - {album['title']}"), reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
@@ -62,7 +57,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            img = await image(album['title'], album['cover_big'])
+            img = image(album['cover_big'])
             client.downloads[query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
             await query.answer(F"Downloading {album['title']} album...")
             queue = await query.message.reply_text(text=F"Downloading {album['title']} album tracks...\n{len(tracks)} left...")
@@ -77,14 +72,16 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     method_save=1
                 )
                 await queue.edit_text(text=F"Downloading {track['title']} track...\n{counter}/{len(tracks)} left...")
-                await query.message.reply_audio(audio=download.song_path, title=track['title'], performer=album['artist']['name'], duration=track['duration'])
+                await query.message.reply_audio(audio=download.song_path, title=track['title'], performer=album['artist']['name'], duration=track['duration'], thumb=F"./plugins/{img}")
                 os.remove(download.song_path)
                 counter += 1
+            await queue.delete()
             await query.message.reply_text("Done!")
             del client.downloads[query.message.from_user.id]
+            os.remove(F"./plugins/{img}")
     elif relate == "download":
         track = client.dezapi.get_track(id)
-        img = await image(track['album']['title'], track['album']['cover_big'])
+        img = image(track['album']['cover_big'])
         await query.answer(F"Downloading {track['title']} track...")
         download = client.dezlog.download_trackdee(
             track['link'],
@@ -94,5 +91,6 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await query.message.reply_audio(audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'])
+        await query.message.reply_audio(audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], thumb=F"./plugins/{img}")
         os.remove(download.song_path)
+        os.remove(F"./plugins/{img}")
