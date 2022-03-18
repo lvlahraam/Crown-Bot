@@ -27,7 +27,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             ]
         ]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=artist['picture_big'], caption=artist['name'], reply_markup=markup)
+        await client.message.reply_photo(photo=artist['picture_big'], caption=artist['name'], reply_markup=markup)
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.dezapi.get_album(id)
@@ -45,7 +45,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         keyboard.append([types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = types.InlineKeyboardMarkup(keyboard)
-        await Client.send_photo(self=Client, chat_id=query.message.chat.id, photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
+        await client.message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":
         downloading = client.downloads.get(query.message.from_user.id)
@@ -68,8 +68,8 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     recursive_download=True,
                     method_save=1
                 )
-                await Client.progress(queue, counter, len(tracks))
-                await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
+                await client.progress(queue, counter, len(tracks))
+                await client.send_audio(self=client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()
@@ -86,5 +86,5 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             recursive_download=True,
             method_save=1
         )
-        await Client.send_audio(self=Client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
+        await client.send_audio(self=client, chat_id=query.message.chat.id, audio=pathlib.Path(download.song_path).read_bytes(), title=track['title'], performer=track['artist']['name'], duration=track['duration'])
         os.remove(download.song_path)

@@ -13,6 +13,8 @@ app.dezlog = DeeLogin(arl=os.getenv("ARL"))
 app.dezapi = API()
 app.dezgw = API_GW(arl=os.getenv("ARL"))
 
+app.message = pyrogram.types.Message
+
 app.downloads = {}
 
 def image(name, url):
