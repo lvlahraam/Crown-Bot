@@ -15,8 +15,8 @@ app.dezgw = deezloader.API_GW(arl=os.getenv("ARL"))
 
 app.downloads = {}
 
-async def progress(message:pyrogram.types.Message, current:int, total:int):
-    await message.edit_text(F"{current * 100 / total:.1f}%")
+async def progress(name:str, message:pyrogram.types.Message, current:int, total:int):
+    await message.edit_text(F"Downloading: / {name} \ {current * 100 / total:.1f}%")
 app.progress = progress
 
 app.run()
