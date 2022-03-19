@@ -68,8 +68,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     recursive_download=True,
                     method_save=1
                 )
-                await client.progress(queue, counter, len(tracks))
-                await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'])
+                await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await client.progress(queue, counter, len(tracks)))
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()

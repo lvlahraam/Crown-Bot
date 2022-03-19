@@ -1,6 +1,6 @@
 from pyrogram import Client, filters, types
 
-@Client.on_message(filters.private | filters.regex("deezer"))
+@Client.on_message(filters.private | filters.regex("deezer.com"))
 async def search(client:Client, message:types.Message):
     text = message.text
     if "/" in text:
