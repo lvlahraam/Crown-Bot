@@ -1,5 +1,5 @@
 import logging, os, requests, shutil
-from deezloader.deezloader import DeeLogin, API, API_GW
+from deezloader import deezloader
 import pyrogram
 
 logging.basicConfig(
@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 app = pyrogram.Client(session_name="crownmusicbot", bot_token=os.getenv("TOKEN"), api_id=os.getenv("API_ID"), api_hash=os.getenv("API_HASH"), plugins=dict(root="plugins")) 
 
-app.dezlog = DeeLogin(arl=os.getenv("ARL"))
-app.dezapi = API()
-app.dezgw = API_GW(arl=os.getenv("ARL"))
+app.dezlog = deezloader.DeeLogin(arl=os.getenv("ARL"))
+app.dezapi = deezloader.API()
+app.dezgw = deezloader.API_GW(arl=os.getenv("ARL"))
 
 app.message = pyrogram.types.Message
 
