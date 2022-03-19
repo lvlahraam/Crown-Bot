@@ -1,4 +1,4 @@
-import logging, os, requests, shutil
+import logging, os
 from deezloader import deezloader
 import pyrogram
 

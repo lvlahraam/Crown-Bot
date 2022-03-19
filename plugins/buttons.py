@@ -1,9 +1,5 @@
-import textwrap, pathlib, os, requests, io
+import textwrap, os
 from pyrogram import Client, filters, types
-
-def image(url):
-    res = res = requests.get(url=url, stream=True)
-    return io.BytesIO(res.content)
 
 @Client.on_callback_query()
 async def buttons(client:Client, callback_query:types.CallbackQuery):

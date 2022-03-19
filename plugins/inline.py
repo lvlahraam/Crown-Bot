@@ -1,5 +1,3 @@
-import string
-from deezloader import exceptions
 from pyrogram import Client, filters, types
 
 @Client.on_inline_query()
