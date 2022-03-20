@@ -27,4 +27,4 @@ async def help(client:Client, message:types.Message):
 @Client.on_message(filters.command("me"))
 async def me(client:Client, message:types.Message):
     me = message.from_user
-    await message.reply(F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
+    await message.reply_text(F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
