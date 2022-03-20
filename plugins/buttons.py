@@ -37,8 +37,8 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
                 keyboard.append(key)
                 ids.append(track['id'])
                 counter += 1
-        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
-        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
+        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
         markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
         await query.message.reply_photo(photo=album['cover_big'], caption=F"{album['title']} - {album['artist']['name']}", reply_markup=markup)
         await query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
@@ -63,7 +63,9 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
                     recursive_download=True,
                     method_save=1
                 )
-                await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await client.progress(track['title'], queue, counter, len(tracks)))
+                keyboard = [[pyrogram.types.InlineKeyboardButton("Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")]]
+                markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
+                await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await client.progress(track['title'], queue, counter, len(tracks)), reply_markup=markup)
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()
@@ -80,5 +82,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             recursive_download=True,
             method_save=1
         )
-        await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'])
+        keyboard = [[pyrogram.types.InlineKeyboardButton("Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")]]
+        markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
+        await client.send_audio(chat_id=query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], reply_markup=markup)
         os.remove(download.song_path)

@@ -44,8 +44,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
             add = data['id']
         elif data['type'] == "album":
             name = data['title']
-            artist = data.get("artist") or client.dezapi.get_artist(query)
-            description = F"{artist['name']}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
+            description = F"{data.get('artist')['name'] or ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
             thumbnail = data['cover']
             add = data['id']
         elif data['type'] == "track":

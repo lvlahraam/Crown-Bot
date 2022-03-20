@@ -39,8 +39,8 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 else:
                     key = [pyrogram.types.InlineKeyboardButton(F"{tracks[0]['title']} 💿", callback_data=F"download|{tracks[0]['id']}")]
                     keyboard.append(key)
-                if len(tracks) > 1: keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get All Tracks 💽", callback_data=F"getall|{album['id']}")])
-                keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+                if len(tracks) > 1: keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
+                keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
                 markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
                 await message.reply_photo(photo=album['cover_big'], caption=F"{album['artist']['name']} - {album['title']}", reply_markup=markup)
             elif items[3] == "track":
@@ -48,11 +48,11 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 keyboard = [
                     [
                         pyrogram.types.InlineKeyboardButton(F"{track['title']} 💿", callback_data=F"download|{track['id']}"),
-                        pyrogram.types.InlineKeyboardButton(F"Get The Lyrics 📓", callback_data=F"lyrics|{track['id']}")
+                        pyrogram.types.InlineKeyboardButton(F"Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")
                     ],
                     [
-                        pyrogram.types.InlineKeyboardButton(F"Go To Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
-                        pyrogram.types.InlineKeyboardButton(F"Go To Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
+                        pyrogram.types.InlineKeyboardButton(F"Go to Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
+                        pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
                     ]
                 ]
                 markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
