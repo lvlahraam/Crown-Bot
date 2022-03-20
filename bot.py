@@ -1,4 +1,4 @@
-import pyrogram, deezloader, logging, os
+import pyrogram, deezloader.deezloader, logging, os
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO

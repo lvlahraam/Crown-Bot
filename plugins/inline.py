@@ -1,7 +1,7 @@
-from pyrogram import Client, filters, types
+import pyrogram
 
-@Client.on_inline_query()
-async def inline(client:Client, inline_query:types.InlineQuery):
+@pyrogram.Client.on_inline_query()
+async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery):
     text = inline_query.query
     if text is None or not text.startswith("."): return
     query = " ".join(text.split(" ")[1:])
@@ -11,22 +11,22 @@ async def inline(client:Client, inline_query:types.InlineQuery):
         if query.isdigit():
               search = client.dezapi.get_artist_top_albums(query, limit=25)
         else:
-            item = result = types.InlineQueryResultArticle(
+            item = result = pyrogram.types.InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
                 title="Not an ID!",
                 description="Query must be the artist's ID",
-                input_message_content=types.InputTextMessageContent("/help")
+                input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             return await inline_query.answer(results=[item])
     elif text.startswith(".trks"):
         if query.isdigit():
             search = client.dezapi.get_artist_top_tracks(query, limit=25)
         else:
-            item = result = types.InlineQueryResultArticle(
+            item = result = pyrogram.types.InlineQueryResultArticle(
                 id="BADTRACKSSEARCH",
                 title="Not an ID!",
                 description="Query must be the artist's ID",
-                input_message_content=types.InputTextMessageContent("/help")
+                input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             return await inline_query.answer(results=[item])
     elif text.startswith(".art"):
@@ -54,12 +54,12 @@ async def inline(client:Client, inline_query:types.InlineQuery):
             thumbnail = data['album']['cover']
             add = data['id']
         if not add in added:
-            result = types.InlineQueryResultArticle(
+            result = pyrogram.types.InlineQueryResultArticle(
                 id=data['id'],
                 title=name,
                 description=description,
                 thumb_url=thumbnail,
-                input_message_content=types.InputTextMessageContent(data['link'])
+                input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
             )
             if len(results) >= 50: break
             results.append(result)
