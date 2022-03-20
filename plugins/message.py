@@ -1,6 +1,6 @@
 from pyrogram import Client, filters, types
 
-@Client.on_message(filters.private | filters.regex("deezer.com"))
+@Client.on_message(filters.private | filters.regex("deezer.com") | filters.regex("spotify.com"))
 async def search(client:Client, message:types.Message):
     text = message.text
     if "/" in text:
@@ -57,6 +57,7 @@ async def search(client:Client, message:types.Message):
                 ]
                 markup = types.InlineKeyboardMarkup(keyboard)
                 await message.reply_photo(photo=track['album']['cover_big'], caption=F"{track['artist']['name']} - {track['title']}", reply_markup=markup)
+        # elif 
         else:
             await message.reply_text(text=F"Invalid {'spotify' if 'spotify'in items[2] else 'deezer'} url!\n\n1. The url must either be from deezer.com or spotify.com\n2. If your given url is a playlist:\nThis Bot will not download playlists, Due to the playlist might be a day long")
     else:
