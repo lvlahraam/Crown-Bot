@@ -27,14 +27,13 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     for data in datas:
         if data['type'] == "artist":
             description = data['followers']['total']
-            print(F"\n{data['images'][0]['url']}\n")
             thumbnail = data['images'][0]['url'] if len(data['images']) >= 1 else None
         elif data['type'] == "album":
             description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
-            thumbnail = data['images'][0]['url']
+            thumbnail = data['images'][0]['url'] if len(data['images']) >= 1 else None
         elif data['type'] == "track":
             description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
-            thumbnail = data['album']['images'][0]['url']
+            thumbnail = data['album']['images'][0]['url'] if len(data['album']['images']) >= 1 else None
         if not data['id'] in added:
             result = pyrogram.types.InlineQueryResultArticle(
                 id=data['id'],
