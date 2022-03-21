@@ -3,7 +3,7 @@ import pyrogram
 @pyrogram.Client.on_inline_query()
 async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery):
     text = inline_query.query
-    if text is None or not text.startswith("."):
+    if text is None or not text.startswith(".") or (".art", ".alb", ".trk") not in text:
         search = client.spotify.new_releases()
         datas = search['albums']['items']
     query = " ".join(text.split(" ")[1:])
