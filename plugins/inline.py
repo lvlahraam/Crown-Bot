@@ -27,6 +27,8 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     for data in datas:
         if data['type'] == "artist":
             description = data['followers']['total']
+            print(F"\n\n{data}\n\n")
+            print(F"\n\n\n{data['images']}\n\n\n")
             thumbnail = data['images'][0]['url']
         elif data['type'] == "album":
             description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
