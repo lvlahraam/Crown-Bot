@@ -30,16 +30,19 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     for data in datas:
         if data['type'] == "artist":
             description = data['followers']['total']
+            thumbnail = data['images'][0]['url']
         elif data['type'] == "album":
             description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
+            thumbnail = data['images'][0]['url']
         elif data['type'] == "track":
             description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
+            thumbnail = data['album']['images'][0]['url']
         if not data['id'] in added:
             result = pyrogram.types.InlineQueryResultArticle(
                 id=data['id'],
                 title=data['name'],
                 description=description,
-                thumb_url=data['images'][0]['url'],
+                thumb_url=thumbnail,
                 input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
             )
             if len(results) >= 20: break
