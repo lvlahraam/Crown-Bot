@@ -20,7 +20,8 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 [
                     pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
                     pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
-                ]
+                ],
+                [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
             ]
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             await message.reply_text(text="Invalid Spotify URL!", reply_markup=markup)
@@ -30,7 +31,8 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 [
                     pyrogram.types.InlineKeyboardButton(text="Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
                     pyrogram.types.InlineKeyboardButton(text="Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
-                ]
+                ],
+                [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
             ]
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             await message.reply_photo(photo=artist["images"][0]["url"], caption=artist["name"], reply_markup=markup)
@@ -49,6 +51,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 keyboard.append(key)
             if len(tracks) > 1: keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
             keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artists'][0]['id']}")])
+            keyboard.append([pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")])
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             await message.reply_photo(photo=album['images'][0]['url'], caption=F"{album['artists'][0]['name']} - {album['name']}", reply_markup=markup)
         elif relate == "track":
@@ -61,7 +64,8 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 [
                     pyrogram.types.InlineKeyboardButton(F"Go to Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
                     pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{track['artists'][0]['id']}")
-                ]
+                ],
+                [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
             ]
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             await message.reply_photo(photo=track['album']['images'][0]['url'], caption=F"{track['artists'][0]['name']} - {track['name']}", reply_markup=markup)
@@ -71,7 +75,8 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
             [
                 pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=F".alb {text}"),
                 pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=F".trk {text}")
-            ]
+            ],
+            [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
         ]
         markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
         await message.reply_text(text=F"Searched: {text}", reply_markup=markup)
