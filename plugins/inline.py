@@ -23,27 +23,36 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
         search = client.spotify.search(q=query, type="track")
         datas = search['tracks']['items']
     results = []
-    added = []
-    for data in datas:
-        if data['type'] == "artist":
-            description = data['followers']['total']
-            if len(data['images']) >= 1:
-                thumbnail = data['images'][0]['url']
-        elif data['type'] == "album":
-            description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
-            if len(data['images']) >= 1:
-                thumbnail = data['images'][0]['url']
-        elif data['type'] == "track":
-            description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
-            if len(data['album']['images']) >= 1:
-                thumbnail = data['album']['images'][0]['url']
+    if len(datas) >= 1:
+        added = []
+        for data in datas:
+            if data['type'] == "artist":
+                description = data['followers']['total']
+                if len(data['images']) >= 1:
+                    thumbnail = data['images'][0]['url']
+            elif data['type'] == "album":
+                description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
+                if len(data['images']) >= 1:
+                    thumbnail = data['images'][0]['url']
+            elif data['type'] == "track":
+                description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
+                if len(data['album']['images']) >= 1:
+                    thumbnail = data['album']['images'][0]['url']
+            result = pyrogram.types.InlineQueryResultArticle(
+                id=data['id'],
+                title=data['name'],
+                description=description,
+                thumb_url=thumbnail or None,
+                input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
+            )
+            results.append(result)
+            added.append(data['id'])
+    else:
         result = pyrogram.types.InlineQueryResultArticle(
-            id=data['id'],
-            title=data['name'],
-            description=description,
-            thumb_url=thumbnail or None,
-            input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
+            id="404",
+            title="Couldn't found anything",
+            description="Try to search for something else",
+            input_message_content=pyrogram.types.InputTextMessageContent("/help")
         )
         results.append(result)
-        added.append(data['id'])
     await inline_query.answer(results)

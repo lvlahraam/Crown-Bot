@@ -2,11 +2,12 @@ import pyrogram, textwrap, os
 
 @pyrogram.Client.on_callback_query()
 async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.CallbackQuery):
-    data = callback_query.data.split("|")
-    if data == "delete":
+    if callback_query.data == "delete":
         return await callback_query.message.delete()
-    relate = data[0]
-    id = data[1]
+    else:
+        data = callback_query.data.split("|")
+        relate = data[0]
+        id = data[1]
     if relate == "lyrics":
         track = client.spotify.track(id)
         lyrics = client.dezgw.get_lyric(id)
