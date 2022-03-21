@@ -3,34 +3,19 @@ import pyrogram
 @pyrogram.Client.on_inline_query()
 async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery):
     text = inline_query.query
-    if text is None or not text.startswith("."): return
+    if text is None or not text.startswith("."):
+        search = client.spotify.new_releases()
+        datas = search['items']
     query = " ".join(text.split(" ")[1:])
-    if query is None: return
-    results = []
+    if query is None:
+        search = client.spotify.new_releases()
+        datas = search['items']
     if text.startswith(".albs"):
-        if query.isdigit():
-              search = client.spotify.artist_albums(artist_id=query)
-              datas = search['items']
-        else:
-            item = result = pyrogram.types.InlineQueryResultArticle(
-                id="BADALBUMSSEARCH",
-                title="Not an ID!",
-                description="Query must be the artist's ID",
-                input_message_content=pyrogram.types.InputTextMessageContent("/help")
-            )
-            return await inline_query.answer(results=[item])
+        search = client.spotify.artist_albums(artist_id=query)
+        datas = search['items']
     elif text.startswith(".trks"):
-        if query.isdigit():
-            search = client.spotify.artist_top_tracks(artist_id=query)
-            datas = search['tracks']
-        else:
-            item = result = pyrogram.types.InlineQueryResultArticle(
-                id="BADTRACKSSEARCH",
-                title="Not an ID!",
-                description="Query must be the artist's ID",
-                input_message_content=pyrogram.types.InputTextMessageContent("/help")
-            )
-            return await inline_query.answer(results=[item])
+        search = client.spotify.artist_top_tracks(artist_id=query)
+        datas = search['tracks']
     elif text.startswith(".art"):
         search = client.spotify.search(q=query, type="artist")
         datas = search['artists']['items']
@@ -40,6 +25,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     elif text.startswith(".trk"):
         search = client.spotify.search(q=query, type="track")
         datas = search['tracks']['items']
+    results = []
     added = []
     for data in datas:
         if data['type'] == "artist":
@@ -56,7 +42,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 thumb_url=data['images'][0]['url'],
                 input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
             )
-            if len(results) >= 50: break
+            if len(results) >= 20: break
             results.append(result)
             added.append(data['id'])
         else: pass
