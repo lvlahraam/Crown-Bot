@@ -54,7 +54,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 title=data['name'],
                 description=description,
                 thumb_url=data['images'][0]['url'],
-                input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
+                input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
             )
             if len(results) >= 50: break
             results.append(result)
