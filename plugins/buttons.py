@@ -28,15 +28,9 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         album = client.spotify.album(id)
         tracks = album['tracks']['items']
         keyboard = []
-        ids = []
-        counter = 1
         for track in tracks:
-            if track['id'] in ids: pass
-            else:
-                key = [pyrogram.types.InlineKeyboardButton(F"{track['track_number']}. {track['name']} 💿", callback_data=F"download|{track['id']}")]
-                keyboard.append(key)
-                ids.append(track['id'])
-                counter += 1
+            key = [pyrogram.types.InlineKeyboardButton(F"{track['track_number']}. {track['name']} 💿", callback_data=F"download|{track['id']}")]
+            keyboard.append(key)
         keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
         keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artists'][0]['id']}")])
         markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
