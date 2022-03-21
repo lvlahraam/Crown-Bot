@@ -50,14 +50,13 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         else:
             album = client.spotify.album(id)
             tracks = album['tracks']['item']
-            print(track['uri'].replace(":", "/").replace("spotify", "spotify.com"))
             client.downloads[query.message.from_user.id] = F"{album['name']} by {album['artists'][0]['name']}"
             await query.answer(F"Downloading {album['name']} album...")
             queue = await query.message.reply_text(text=F"Downloading...")
             counter = 1
             for track in tracks:
                 download = client.deezer.download_trackspo(
-                    track['uri'].replace(":", "/").replace("spotify", "spotify.com"),
+                    track['uri'].replace(":", "/").replace("spotify", "https://open.spotify.com"),
                     output_dir=F"./musics/",
                     quality_download="MP3_128",
                     recursive_quality=True,
@@ -74,10 +73,9 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             del client.downloads[query.message.from_user.id]
     elif relate == "download":
         track = client.spotify.track(id)
-        print(track['uri'].replace(":", "/").replace("spotify", "spotify.com"))
         await query.answer(F"Downloading {track['name']} track...")
         download = client.deezer.download_trackspo(
-            track['uri'].replace(":", "/").replace("spotify", "open.spotify.com"),
+            track['uri'].replace(":", "/").replace("spotify", "https://open.spotify.com"),
             output_dir=F"./musics/",
             quality_download="MP3_128",
             recursive_quality=True,
