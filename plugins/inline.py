@@ -33,7 +33,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
         elif data['type'] == "album":
             description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
         elif data['type'] == "track":
-            description = F"{data['artists'][0]['name']}\n{data['album']['title']}\n{data['album']['release_date']}"
+            description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
         if not data['id'] in added:
             result = pyrogram.types.InlineQueryResultArticle(
                 id=data['id'],
