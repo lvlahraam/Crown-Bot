@@ -26,7 +26,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         await query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
         album = client.spotify.album(id)
-        tracks = album['tracks']['item']
+        tracks = album['tracks']['items']
         keyboard = []
         ids = []
         counter = 1
