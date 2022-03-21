@@ -9,7 +9,8 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     results = []
     if text.startswith(".albs"):
         if query.isdigit():
-              search = client.dezapi.get_artist_top_albums(query, limit=25)
+              search = client.spotify.artist_albums(artist_id=query)
+              datas = search['items']
         else:
             item = result = pyrogram.types.InlineQueryResultArticle(
                 id="BADALBUMSSEARCH",
@@ -20,7 +21,8 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
             return await inline_query.answer(results=[item])
     elif text.startswith(".trks"):
         if query.isdigit():
-            search = client.dezapi.get_artist_top_tracks(query, limit=25)
+            search = client.spotify.artist_top_tracks(artist_id=query)
+            datas = search['tracks']
         else:
             item = result = pyrogram.types.InlineQueryResultArticle(
                 id="BADTRACKSSEARCH",
@@ -30,38 +32,32 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
             )
             return await inline_query.answer(results=[item])
     elif text.startswith(".art"):
-        search = client.dezapi.search_artist(query=query)
+        search = client.spotify.search(q=query, type="artist")
+        datas = search['artists']['items']
     elif text.startswith(".alb"):
-        search = client.dezapi.search_album(query=query)
+        search = client.spotify.search(q=query, type="album")
+        datas = search['albums']['items']
     elif text.startswith(".trk"):
-        search = client.dezapi.search_track(query=query)
+        search = client.spotify.search(q=query, type="track")
+        datas = search['tracks']['items']
     added = []
-    for data in search['data']:
+    for data in datas:
         if data['type'] == "artist":
-            name = data['name']
-            description = F"{data['nb_album']}\n{data['nb_fan']}"
-            thumbnail = data['picture']
-            add = data['id']
+            description = data['followers']['total']
         elif data['type'] == "album":
-            name = data['title']
-            description = F"{data.get('artist').get('name') if data.get('artist') else ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
-            thumbnail = data['cover']
-            add = data['id']
+            description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
         elif data['type'] == "track":
-            name = data['title']
-            description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
-            thumbnail = data['album']['cover']
-            add = data['id']
-        if not add in added:
+            description = F"{data['artists'][0]['name']}\n{data['album']['title']}\n{data['album']['release_date']}"
+        if not data['id'] in added:
             result = pyrogram.types.InlineQueryResultArticle(
                 id=data['id'],
-                title=name,
+                title=data['name'],
                 description=description,
-                thumb_url=thumbnail,
+                thumb_url=data['images'][0]['url'],
                 input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
             )
             if len(results) >= 50: break
             results.append(result)
-            added.append(add)
+            added.append(data['id'])
         else: pass
     await inline_query.answer(results)

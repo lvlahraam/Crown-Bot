@@ -3,10 +3,10 @@ import pyrogram
 @pyrogram.Client.on_message(pyrogram.filters.command("start"))
 async def start(client:pyrogram.Client, message:pyrogram.types.Message):
     keyboard = [
-        [pyrogram.types.InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+        [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
-            pyrogram.types.InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=".alb "),
-            pyrogram.types.InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=".trk ")
+            pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
+            pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
         ]
     ]
     markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
@@ -15,10 +15,10 @@ async def start(client:pyrogram.Client, message:pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.command("help"))
 async def help(client:pyrogram.Client, message:pyrogram.types.Message):
     keyboard = [
-        [pyrogram.types.InlineKeyboardButton("Search Artist 👤", switch_inline_query_current_chat=".art ")],
+        [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")],
         [
-            pyrogram.types.InlineKeyboardButton("Search Album 📼", switch_inline_query_current_chat=".alb "),
-            pyrogram.types.InlineKeyboardButton("Search Track 💿", switch_inline_query_current_chat=".trk ")
+            pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
+            pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
         ]
     ]
     markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
