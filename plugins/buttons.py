@@ -49,7 +49,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             await query.message.reply_text(text=F"You are currently downloading:\n{downloading}\nPlease wait for it to complete!")
         else:
             album = client.spotify.album(id)
-            tracks = album['tracks']['item']
+            tracks = album['tracks']['items']
             client.downloads[query.message.from_user.id] = F"{album['name']} by {album['artists'][0]['name']}"
             await query.answer(F"Downloading {album['name']} album...")
             queue = await query.message.reply_text(text=F"Downloading...")
