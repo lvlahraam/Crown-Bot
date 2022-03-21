@@ -56,7 +56,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             counter = 1
             for track in tracks:
                 download = client.deezer.download_trackspo(
-                    track['uri'],
+                    track['uri'].replace(":", "/").replace("spotify", "open.spotify.com"),
                     output_dir=F"./musics/",
                     quality_download="MP3_128",
                     recursive_quality=True,
@@ -75,7 +75,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         track = client.spotify.track(id)
         await query.answer(F"Downloading {track['name']} track...")
         download = client.deezer.download_trackspo(
-            track['uri'],
+            track['uri'].replace(":", "/").replace("spotify", "open.spotify.com"),
             output_dir=F"./musics/",
             quality_download="MP3_128",
             recursive_quality=True,
