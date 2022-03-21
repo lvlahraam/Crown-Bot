@@ -48,7 +48,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
                 key = [pyrogram.types.InlineKeyboardButton(F"{tracks[0]['name']} 💿", callback_data=F"download|{tracks[0]['id']}")]
                 keyboard.append(key)
             if len(tracks) > 1: keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
-            keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artists']['id']}")])
+            keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artists'][0]['id']}")])
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             return await message.reply_photo(photo=album['images'][0]['url'], caption=F"{album['artists'][0]['name']} - {album['name']}", reply_markup=markup)
         elif relate == "track":
