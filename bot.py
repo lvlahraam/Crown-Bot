@@ -6,8 +6,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 app = pyrogram.Client(session_name="crownmusicbot", bot_token=os.getenv("TOKEN"), api_id=os.getenv("API_ID"), api_hash=os.getenv("API_HASH"), plugins=dict(root="plugins")) 
 
-app.deezer = deezloader.deezloader.DeeLogin(arl=os.getenv("ARL"))
 app.spotify = spotipy.Spotify(auth_manager=spotipy.SpotifyClientCredentials(client_id=os.getenv("CLIENT_ID"), client_secret=os.getenv("CLIENT_SECRET")))
+
+app.deezer = deezloader.deezloader.DeeLogin(arl=os.getenv("ARL"))
+app.dezgw = deezloader.deezloader.API_GW(arl=os.getenv("ARL"))
 
 app.downloads = {}
 

@@ -11,7 +11,8 @@ async def help(client:pyrogram.Client, message:pyrogram.types.Message):
         [
             pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
             pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
-        ]
+        ],
+        [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
     ]
     markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
     await message.reply_text(text="You can search for music by sending a message\nOr sending a Spotify URL\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) tags and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow\n\nFor artist's albums you could do\nFor example: `@crownmusicbot .albs [artist's spotify id]`\nFor artist's tracks you could do\nFor example: `@crownmusicbot .trks [artist's spotify id]`\nOr even by just searching for the artist and then click on albums or tracks button\n\nIf you wanted to see some information about yourself\nYou could try the /me command", reply_markup=markup)
