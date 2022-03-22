@@ -8,14 +8,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         data = callback_query.data.split("|")
         relate = data[0]
         id = data[1]
-    if relate == "lyrics":
-        track = client.spotify.track(id)
-        lyrics = client.dezgw.get_lyric(id)
-        wraps = textwrap.wrap(lyrics['LYRICS_TEXT'], width=1024)
-        for wrapped in wraps:
-            await callback_query.message.reply_text(text=wrapped.replace("  ", "\n"))
-        await callback_query.answer(F"Here are the lyrics for {track['name']} track...")
-    elif relate == "goartist":
+    if relate == "goartist":
         artist = client.spotify.artist(id)
         keyboard = [
             [
@@ -61,8 +54,6 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
                     recursive_download=True,
                     method_save=1
                 )
-                keyboard = [[pyrogram.types.InlineKeyboardButton(text="Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")]]
-                markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
                 await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'], progress=await client.progress(track['name'], queue, counter, len(tracks)), reply_markup=markup)
                 os.remove(download.song_path)
                 counter += 1
@@ -80,7 +71,5 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             recursive_download=True,
             method_save=1
         )
-        keyboard = [[pyrogram.types.InlineKeyboardButton(text="Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")]]
-        markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
         await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'], reply_markup=markup)
         os.remove(download.song_path)

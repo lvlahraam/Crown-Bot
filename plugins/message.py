@@ -59,7 +59,6 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
             keyboard = [
                 [
                     pyrogram.types.InlineKeyboardButton(F"{track['name']} 💿", callback_data=F"download|{track['id']}"),
-                    pyrogram.types.InlineKeyboardButton(F"Get the Lyrics 📓", callback_data=F"lyrics|{track['id']}")
                 ],
                 [
                     pyrogram.types.InlineKeyboardButton(F"Go to Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
