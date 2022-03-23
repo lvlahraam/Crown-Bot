@@ -4,10 +4,9 @@ import pyrogram, textwrap, os
 async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.CallbackQuery):
     if callback_query.data == "delete":
         return await callback_query.message.delete()
-    else:
-        data = callback_query.data.split("|")
-        relate = data[0]
-        id = data[1]
+    data = callback_query.data.split("|")
+    relate = data[0]
+    id = data[1]
     if relate == "goartist":
         artist = client.spotify.artist(id)
         keyboard = [
@@ -54,7 +53,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
                     recursive_download=True,
                     method_save=1
                 )
-                await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'], progress=await client.progress(track['name'], queue, counter, len(tracks)), reply_markup=markup)
+                await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'], progress=await client.progress(track['name'], queue, counter, len(tracks)))
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()
@@ -71,5 +70,5 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             recursive_download=True,
             method_save=1
         )
-        await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'], reply_markup=markup)
+        await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['name'], performer=track['artists'][0]['name'], duration=track['duration_ms'])
         os.remove(download.song_path)
