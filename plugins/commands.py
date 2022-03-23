@@ -7,7 +7,10 @@ async def start(client:pyrogram.Client, message:pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.command("help"))
 async def help(client:pyrogram.Client, message:pyrogram.types.Message):
     keyboard = [
-        [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")],
+        [
+            pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwwr "),
+            pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
+        ],
         [
             pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
             pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
