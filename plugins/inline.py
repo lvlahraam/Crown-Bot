@@ -7,7 +7,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
         search = client.spotify.new_releases()
         datas = search['albums']['items']
     query = " ".join(text[1:])
-    if not query.issapce():
+    if not query.isspace():
         if text.startswith(".albs"):
             search = client.spotify.artist_albums(artist_id=query)
             datas = search['items']
