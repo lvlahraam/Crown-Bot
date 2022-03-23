@@ -17,7 +17,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
         if relate not in ("artist", "album", "track"):
             keyboard = [
                 [
-                    pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwwr "),
+                    pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwr "),
                     pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
                 ],
                 [
@@ -74,7 +74,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
     else:
         keyboard = [
             [
-                pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwwr "),
+                pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwr "),
                 pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
             ],
             [
