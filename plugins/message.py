@@ -75,7 +75,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
         keyboard = [
             [
                 pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwr "),
-                pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
+                pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {text}")
             ],
             [
                 pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=F".alb {text}"),
