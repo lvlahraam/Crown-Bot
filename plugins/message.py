@@ -29,7 +29,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
             markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
             await message.reply_text(text="Invalid Spotify URL!", reply_markup=markup)
         elif relate == "artist":
-            artist = client.spoitfy.artist(id)
+            artist = client.spotify.artist(id)
             keyboard = [
                 [
                     pyrogram.types.InlineKeyboardButton(text="Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
