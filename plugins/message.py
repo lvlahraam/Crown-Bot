@@ -16,7 +16,10 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
             await message.reply_text(text=F"Invalid Spotify URL!\n\n1. The url must be from spotify.com\n2. If your given url is a playlist:\nThis Bot will not download playlists, Due to the playlist might be a day long")
         if relate not in ("artist", "album", "track"):
             keyboard = [
-                [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")],
+                [
+                    pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwwr "),
+                    pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
+                ],
                 [
                     pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=".alb "),
                     pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=".trk ")
@@ -70,7 +73,10 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
             await message.reply_photo(photo=track['album']['images'][0]['url'], caption=F"{track['artists'][0]['name']} - {track['name']}", reply_markup=markup)
     else:
         keyboard = [
-            [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {text}")],
+            [
+                pyrogram.types.InlineKeyboardButton(text="New Releases 📰", switch_inline_query_current_chat=".nwwr "),
+                pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=".art ")
+            ],
             [
                 pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=F".alb {text}"),
                 pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=F".trk {text}")
