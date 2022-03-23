@@ -30,7 +30,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
             added = []
             for data in datas:
                 if data['type'] == "artist":
-                    description = data['followers']['total']
+                    description = F"{data['followers']['total']}"
                     if len(data['images']) >= 1:
                         thumbnail = data['images'][0]['url']
                 elif data['type'] == "album":
@@ -58,4 +58,4 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             results.append(result)
-        await inline_query.answer(results)
+        await inline_query.answer(results=results)
