@@ -9,7 +9,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
         if option == ".nwr":
                 search = client.spotify.new_releases()
                 datas = search['albums']['items']
-        elif not query.isspace():
+        if not query.isspace():
             if option == ".art":
                 search = client.spotify.search(q=query, type="artist")
                 datas = search['artists']['items']
