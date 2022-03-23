@@ -3,24 +3,25 @@ import pyrogram, string
 @pyrogram.Client.on_inline_query()
 async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery):
     text = inline_query.query.split(" ")
-    if text[0] not in (".art", ".alb", ".albs", ".trk", ".trks"):
+    option = text[0]
+    query = " ".join(text[1:])
+    if option[0] not in (".art", ".alb", ".albs", ".trk", ".trks"):
         search = client.spotify.new_releases()
         datas = search['albums']['items']
-    query = " ".join(text[1:])
     if not query.isspace():
-        if text.startswith(".albs"):
+        if option == ".albs":
             search = client.spotify.artist_albums(artist_id=query)
             datas = search['items']
-        elif text.startswith(".trks"):
+        elif option == ".trks":
             search = client.spotify.artist_top_tracks(artist_id=query)
             datas = search['tracks']
-        elif text.startswith(".art"):
+        elif option == ".art":
             search = client.spotify.search(q=query, type="artist")
             datas = search['artists']['items']
-        elif text.startswith(".alb"):
+        elif option == ".alb":
             search = client.spotify.search(q=query, type="album")
             datas = search['albums']['items']
-        elif text.startswith(".trk"):
+        elif option == ".trk":
             search = client.spotify.search(q=query, type="track")
             datas = search['tracks']['items']
         results = []
