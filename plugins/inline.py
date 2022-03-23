@@ -5,25 +5,26 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     text = inline_query.query.split(" ")
     option = text[0]
     query = " ".join(text[1:])
-    if option[0] not in (".art", ".alb", ".albs", ".trk", ".trks"):
-        search = client.spotify.new_releases()
-        datas = search['albums']['items']
-    if not query.isspace():
-        if option == ".albs":
-            search = client.spotify.artist_albums(artist_id=query)
-            datas = search['items']
-        elif option == ".trks":
-            search = client.spotify.artist_top_tracks(artist_id=query)
-            datas = search['tracks']
-        elif option == ".art":
-            search = client.spotify.search(q=query, type="artist")
-            datas = search['artists']['items']
-        elif option == ".alb":
-            search = client.spotify.search(q=query, type="album")
-            datas = search['albums']['items']
-        elif option == ".trk":
-            search = client.spotify.search(q=query, type="track")
-            datas = search['tracks']['items']
+    if option in (".nwr", ".art", ".alb", ".albs", ".trk", ".trks"):
+        if option == ".nwr":
+                search = client.spotify.new_releases()
+                datas = search['albums']['items']
+        elif not query.isspace():
+            if option == ".art":
+                search = client.spotify.search(q=query, type="artist")
+                datas = search['artists']['items']
+            elif option == ".alb":
+                search = client.spotify.search(q=query, type="album")
+                datas = search['albums']['items']
+            elif option == ".albs":
+                search = client.spotify.artist_albums(artist_id=query)
+                datas = search['items']
+            elif option == ".trk":
+                search = client.spotify.search(q=query, type="track")
+                datas = search['tracks']['items']
+            elif option == ".trks":
+                search = client.spotify.artist_top_tracks(artist_id=query)
+                datas = search['tracks']
         results = []
         if len(datas) >= 1:
             added = []
@@ -57,12 +58,4 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             results.append(result)
-    else:
-        result = pyrogram.types.InlineQueryResultArticle(
-            id="SPACES",
-            title="Bad search query",
-            description="Search query canot only be spaces",
-            input_message_content=pyrogram.types.InputTextMessageContent("/help")
-        )
-        results.append(result)
     await inline_query.answer(results)
