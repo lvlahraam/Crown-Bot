@@ -58,4 +58,4 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             results.append(result)
-    await inline_query.answer(results)
+        await inline_query.answer(results)
