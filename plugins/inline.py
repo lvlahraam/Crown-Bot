@@ -27,7 +27,6 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 datas = search['tracks']
         results = []
         if len(datas) >= 1:
-            added = []
             for data in datas:
                 if data['type'] == "artist":
                     description = F"{data['followers']['total']}"
@@ -41,17 +40,14 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                     description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
                     if len(data['album']['images']) >= 1:
                         thumbnail = data['album']['images'][0]['url']
-                if not data['name'] in added:
-                    result = pyrogram.types.InlineQueryResultArticle(
-                        id=data['id'],
-                        title=data['name'],
-                        description=description,
-                        thumb_url=thumbnail,
-                        input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
-                    )
-                    results.append(result)
-                    added.append(data['name'])
-                else: pass
+                result = pyrogram.types.InlineQueryResultArticle(
+                    id=data['id'],
+                    title=data['name'],
+                    description=description,
+                    thumb_url=thumbnail,
+                    input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
+                )
+                results.append(result)
         else:
             result = pyrogram.types.InlineQueryResultArticle(
                 id="404",
