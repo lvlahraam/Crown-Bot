@@ -5,6 +5,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     text = inline_query.query.split(" ")
     option = text[0]
     query = " ".join(text[1:])
+    results = []
     if option in (".nwr", ".art", ".alb", ".albs", ".trk", ".trks"):
         if option == ".nwr":
                 search = client.spotify.new_releases()
@@ -25,7 +26,6 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
             elif option == ".trks":
                 search = client.spotify.artist_top_tracks(artist_id=query)
                 datas = search['tracks']
-        results = []
         if len(datas) >= 1:
             for data in datas:
                 if data['type'] == "artist":
@@ -56,4 +56,12 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 input_message_content=pyrogram.types.InputTextMessageContent("/help")
             )
             results.append(result)
-        await inline_query.answer(results=results)
+    else:
+        result = pyrogram.types.InlineQueryResultArticle(
+            id="INVALIDTAGUSAGE",
+            title="Not a Valid Tag",
+            description="Usable tags: .nwr - .art\n.alb - .albs - .trk - .trks",
+            input_message_content=pyrogram.types.InputTextMessageContent("/help")
+        )
+        results.append(result)
+    await inline_query.answer(results=results)
