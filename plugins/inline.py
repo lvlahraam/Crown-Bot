@@ -32,22 +32,27 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                     description = F"{data['followers']['total']}"
                     if len(data['images']) >= 1:
                         thumbnail = data['images'][0]['url']
+                        add = data['name']
                 elif data['type'] == "album":
                     description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
                     if len(data['images']) >= 1:
                         thumbnail = data['images'][0]['url']
+                    add = data['artists'][0]['name']
                 elif data['type'] == "track":
                     description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
                     if len(data['album']['images']) >= 1:
                         thumbnail = data['album']['images'][0]['url']
-                result = pyrogram.types.InlineQueryResultArticle(
-                    id=data['id'],
-                    title=data['name'],
-                    description=description,
-                    thumb_url=thumbnail,
-                    input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
-                )
-                results.append(result)
+                    add = data['album']['name']
+                if not add in added:
+                    result = pyrogram.types.InlineQueryResultArticle(
+                        id=data['id'],
+                        title=data['name'],
+                        description=description,
+                        thumb_url=thumbnail,
+                        input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
+                    )
+                    results.append(result)
+                else: pass
         else:
             result = pyrogram.types.InlineQueryResultArticle(
                 id="404",
