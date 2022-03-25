@@ -27,6 +27,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 search = client.spotify.artist_top_tracks(artist_id=query)
                 datas = search['tracks']
         if len(datas) >= 1:
+            added = []
             for data in datas:
                 if data['type'] == "artist":
                     description = F"{data['followers']['total']}"
@@ -52,6 +53,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                         input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
                     )
                     results.append(result)
+                    added.append(add)
                 else: pass
         else:
             result = pyrogram.types.InlineQueryResultArticle(
