@@ -36,14 +36,14 @@ async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     try:
         exec(to_compile, env)
     except Exception as e:
-        return await ctx.reply(F"```py\n{e.__class__.__name__}: {e}\n```")
+        return await message.reply_text(text=F"`{e.__class__.__name__}: {e}`")
     func = env["func"]
     try:
         with contextlib.redirect_stdout(stdout):
             ret = await func()
     except Exception as e:
         value = stdout.getvalue()
-        await ctx.reply(F"```py\n{value}{traceback.format_exc()}\n```")
+        await message.reply_text(text=F"`{value}{traceback.format_exc()}`")
     else:
         value = stdout.getvalue()
         try:
@@ -52,6 +52,6 @@ async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
             pass
         if ret is None:
             if value:
-                await message.reply_text(text=F"`\n{value}\n`")
+                await message.reply_text(text=F"`{value}`")
         else:
-            await message.reply_text(text=F"`\n{value}{ret}\n`")
+            await message.reply_text(text=F"`{value}{ret}`")
