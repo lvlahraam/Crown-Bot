@@ -6,51 +6,62 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     option = text[0]
     query = " ".join(text[1:])
     results = []
-    if option in (".nwr", ".art", ".alb", ".albs", ".trk", ".trks"):
-        if option == ".nwr":
-                search = client.spotify.new_releases()
-                datas = search['albums']['items']
+    if option in (".art", ".alb", ".albs", ".trk", ".trks"):
         if not query.isspace():
-            if option == ".art":
-                search = client.spotify.search(q=query, type="artist")
-                datas = search['artists']['items']
+            if option == ".albs":
+                if query.isdigit():
+                    search = client.dezapi.get_artist_top_albums(query, limit=10)
+                else:
+                    item = result = pyrogram.types.InlineQueryResultArticle(
+                        id="BADALBUMSSEARCH",
+                        title="Not an ID!",
+                        description="Query must be the artist's ID",
+                        input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                    )
+                    results.append(item)
+            if text.startswith(".trks"):
+                if query.isdigit():
+                    search = client.dezapi.get_artist_top_tracks(query, limit=10)
+                else:
+                    item = result = pyrogram.types.InlineQueryResultArticle(
+                        id="BADALBUMSSEARCH",
+                        title="Not an ID!",
+                        description="Query must be the artist's ID",
+                        input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                    )
+                    results.append(item)
+            elif option == ".art":
+                search = client.dezapi.search_artist(query=query)        
             elif option == ".alb":
-                search = client.spotify.search(q=query, type="album")
-                datas = search['albums']['items']
-            elif option == ".albs":
-                search = client.spotify.artist_albums(artist_id=query)
-                datas = search['items']
+                search = client.dezapi.search_album(query=query)
             elif option == ".trk":
-                search = client.spotify.search(q=query, type="track")
-                datas = search['tracks']['items']
-            elif option == ".trks":
-                search = client.spotify.artist_top_tracks(artist_id=query)
-                datas = search['tracks']
+                search = client.dezapi.search_track(query=query)
+            datas = search['data']
         if len(datas) >= 1:
             added = []
             for data in datas:
                 if data['type'] == "artist":
-                    description = F"{data['followers']['total']}"
-                    if len(data['images']) >= 1:
-                        thumbnail = data['images'][0]['url']
-                        add = data['name']
+                    name = data['name']
+                    description = F"{data['nb_album']}\n{data['nb_fan']}"
+                    thumbnail = data['picture']
+                    add = data['name']
                 elif data['type'] == "album":
-                    description = F"{data['artists'][0]['name']}\n{data['release_date']}\n{data['total_tracks']}"
-                    if len(data['images']) >= 1:
-                        thumbnail = data['images'][0]['url']
-                    add = data['artists'][0]['name']
+                    name = data['title']
+                    description = F"{data.get('artist').get('name') if data.get('artist') else ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
+                    thumbnail = data['cover']
+                    add = data.get('artist').get('name') if data.get('artist') else data['id']
                 elif data['type'] == "track":
-                    description = F"{data['artists'][0]['name']}\n{data['album']['name']}\n{data['album']['release_date']}"
-                    if len(data['album']['images']) >= 1:
-                        thumbnail = data['album']['images'][0]['url']
-                    add = data['album']['name']
+                    name = data['title']
+                    description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
+                    thumbnail = data['album']['cover']
+                    add = data['id']
                 if not add in added:
                     result = pyrogram.types.InlineQueryResultArticle(
                         id=data['id'],
-                        title=data['name'],
+                        title=name,
                         description=description,
                         thumb_url=thumbnail,
-                        input_message_content=pyrogram.types.InputTextMessageContent(data['uri'])
+                        input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
                     )
                     results.append(result)
                     added.append(add)
@@ -67,7 +78,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
         result = pyrogram.types.InlineQueryResultArticle(
             id="INVALIDTAGUSAGE",
             title="Not a Valid Tag",
-            description="Usable tags: .nwr - .art\n.alb - .albs - .trk - .trks",
+            description="Usable tags: .art\n.alb - .albs\n.trk - .trks",
             input_message_content=pyrogram.types.InputTextMessageContent("/help")
         )
         results.append(result)
