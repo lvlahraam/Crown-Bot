@@ -24,7 +24,9 @@ async def me(client:pyrogram.Client, message:pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
 async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     env = {
-        "client": client
+        "pyrogram": pyrogram,
+        "client": client,
+        "message": message
     }
     body = message.command[1]
     env.update(globals())
