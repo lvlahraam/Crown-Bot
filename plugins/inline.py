@@ -8,7 +8,11 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
     results = []
     if option in (".art", ".alb", ".albs", ".trk", ".trks"):
         if not query.isspace():
-            if option == ".albs":
+            if option == ".art":
+                search = client.dezapi.search_artist(query=query)        
+            elif option == ".alb":
+                search = client.dezapi.search_album(query=query)
+            elif option == ".albs":
                 if query.isdigit():
                     search = client.dezapi.get_artist_top_albums(query, limit=10)
                 else:
@@ -19,7 +23,9 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                         input_message_content=pyrogram.types.InputTextMessageContent("/help")
                     )
                     results.append(item)
-            if text.startswith(".trks"):
+            elif option == ".trk":
+                search = client.dezapi.search_track(query=query)
+            elif option == ".trks":
                 if query.isdigit():
                     search = client.dezapi.get_artist_top_tracks(query, limit=10)
                 else:
@@ -30,50 +36,52 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                         input_message_content=pyrogram.types.InputTextMessageContent("/help")
                     )
                     results.append(item)
-            elif option == ".art":
-                search = client.dezapi.search_artist(query=query)        
-            elif option == ".alb":
-                search = client.dezapi.search_album(query=query)
-            elif option == ".trk":
-                search = client.dezapi.search_track(query=query)
             datas = search['data']
-        if len(datas) >= 1:
-            added = []
-            for data in datas:
-                if data['type'] == "artist":
-                    name = data['name']
-                    description = F"{data['nb_album']}\n{data['nb_fan']}"
-                    thumbnail = data['picture']
-                    add = data['name']
-                elif data['type'] == "album":
-                    name = data['title']
-                    description = F"{data.get('artist').get('name') if data.get('artist') else ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
-                    thumbnail = data['cover']
-                    add = data.get('artist').get('name') if data.get('artist') else data['id']
-                elif data['type'] == "track":
-                    name = data['title']
-                    description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
-                    thumbnail = data['album']['cover']
-                    add = data['id']
-                if not add in added:
-                    result = pyrogram.types.InlineQueryResultArticle(
-                        id=data['id'],
-                        title=name,
-                        description=description,
-                        thumb_url=thumbnail,
-                        input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
-                    )
-                    results.append(result)
-                    added.append(add)
-                else: pass
+            if len(datas) >= 1:
+                added = []
+                for data in datas:
+                    if data['type'] == "artist":
+                        name = data['name']
+                        description = F"{data['nb_album']}\n{data['nb_fan']}"
+                        thumbnail = data['picture']
+                        add = data['name']
+                    elif data['type'] == "album":
+                        name = data['title']
+                        description = F"{data.get('artist').get('name') if data.get('artist') else ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
+                        thumbnail = data['cover']
+                        add = data.get('artist').get('name') if data.get('artist') else data['id']
+                    elif data['type'] == "track":
+                        name = data['title']
+                        description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
+                        thumbnail = data['album']['cover']
+                        add = data['id']
+                    if not add in added:
+                        result = pyrogram.types.InlineQueryResultArticle(
+                            id=data['id'],
+                            title=name,
+                            description=description,
+                            thumb_url=thumbnail,
+                            input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
+                        )
+                        results.append(result)
+                        added.append(add)
+                    else: pass
+            else:
+                result = pyrogram.types.InlineQueryResultArticle(
+                    id="404",
+                    title="Couldn't found anything",
+                    description="Try to search for something else",
+                    input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                )
+                results.append(result)
         else:
-            result = pyrogram.types.InlineQueryResultArticle(
-                id="404",
-                title="Couldn't found anything",
-                description="Try to search for something else",
-                input_message_content=pyrogram.types.InputTextMessageContent("/help")
-            )
-            results.append(result)
+                result = pyrogram.types.InlineQueryResultArticle(
+                    id="INVALIDQUERY",
+                    title="Query cannot be spaces",
+                    description="You need to pass a valid query",
+                    input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                )
+                results.append(result)
     else:
         result = pyrogram.types.InlineQueryResultArticle(
             id="INVALIDTAGUSAGE",
