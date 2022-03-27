@@ -43,7 +43,7 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
             client.downloads[callback_query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
-            await callback_query.answer(F"Downloading {album['name']} album...")
+            await callback_query.answer(F"Downloading {album['title']} album...")
             queue = await callback_query.message.reply_text(text=F"Uploading...")
             counter = 1
             for track in tracks:

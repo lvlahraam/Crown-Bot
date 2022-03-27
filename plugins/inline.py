@@ -44,18 +44,15 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                         name = data['name']
                         description = F"{data['nb_album']}\n{data['nb_fan']}"
                         thumbnail = data['picture']
-                        add = data['name']
                     elif data['type'] == "album":
                         name = data['title']
                         description = F"{data.get('artist').get('name') if data.get('artist') else ''}\n{data.get('nb_tracks') or ''}\n{data.get('release_date') or ''}"
                         thumbnail = data['cover']
-                        add = data.get('artist').get('name') if data.get('artist') else data['id']
                     elif data['type'] == "track":
                         name = data['title']
                         description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
                         thumbnail = data['album']['cover']
-                        add = data['id']
-                    if not add in added:
+                    if data['id'] not in added:
                         result = pyrogram.types.InlineQueryResultArticle(
                             id=data['id'],
                             title=name,
@@ -64,7 +61,7 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                             input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
                         )
                         results.append(result)
-                        added.append(add)
+                        added.append(data['id'])
                     else: pass
             else:
                 result = pyrogram.types.InlineQueryResultArticle(
