@@ -50,10 +50,10 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
                 download = client.dezlog.download_trackdee(
                     track['link'],
                     output_dir=F"./musics/",
-                    quality_download="MP3_320",
+                    quality_download="FLAC",
                     recursive_quality=True,
                     recursive_download=True,
-                    method_save=2
+                    method_save=1
                 )
                 await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await client.progress(track['title'], queue, counter, len(tracks)))
                 os.remove(download.song_path)
@@ -67,10 +67,10 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         download = client.dezlog.download_trackdee(
             track['link'],
             output_dir=F"./musics/",
-            quality_download="MP3_320",
+            quality_download="FLAC",
             recursive_quality=True,
             recursive_download=True,
-            method_save=2
+            method_save=1
         )
         await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'])
         os.remove(download.song_path)
