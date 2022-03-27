@@ -44,7 +44,7 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
         elif relate == "track":
             track = client.dezapi.get_track(id)
             keyboard = [
-                [pyrogram.types.InlineKeyboardButton(F"{track['name']} 💿", callback_data=F"download|{track['id']}")],
+                [pyrogram.types.InlineKeyboardButton(F"{track['title']} 💿", callback_data=F"download|{track['id']}")],
                 [
                     pyrogram.types.InlineKeyboardButton(F"Go to Album 📼", callback_data=F"goalbum|{track['album']['id']}"),
                     pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{track['artist']['id']}")
