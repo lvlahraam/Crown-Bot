@@ -21,7 +21,7 @@ async def me(client:pyrogram.Client, message:pyrogram.types.Message):
     me = message.from_user
     await message.reply_text(text=F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
 
-@pyrogram.Client.on_message(pyrogram.filters.command("eval"))
+@pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
 async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     env = {
         "client": client
