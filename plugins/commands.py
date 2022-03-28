@@ -32,7 +32,7 @@ async def commands(client:pyrogram.Client, message:pyrogram.types.Message):
         await client.set_bot_commands(botcommands)
         text = "Commands has been settled"
     else:
-        await client.set_bot_commands(botcommands)
+        await client.set_bot_commands(None)
         text = "Commands has been removed"
     await message.reply_text(text=text)
 
