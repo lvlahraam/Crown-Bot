@@ -24,15 +24,16 @@ async def me(client:pyrogram.Client, message:pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.command("commands") & pyrogram.filters.user(755341301))
 async def commands(client:pyrogram.Client, message:pyrogram.types.Message):
     if len(message.command) > 1:
-        items = message.command[1]
+        items = message.command[1].split("/")
         botcommands = []
         for item in items:
             command = item.split(".")
             botcommands.append(pyrogram.types.BotCommand(command[0], command[2]))
         await client.set_bot_commands(botcommands)
-        text = "Commands has been setted"
+        text = "Commands has been settled"
     else:
-        text = "You must past atleast one command"
+        await client.set_bot_commands(botcommands)
+        text = "Commands has been removed"
     await message.reply_text(text=text)
 
 @pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
