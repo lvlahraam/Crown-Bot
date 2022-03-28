@@ -1,7 +1,8 @@
-import pyrogram, textwrap, os
+from pyrogram import Client, types
+import os
 
-@pyrogram.Client.on_callback_query()
-async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.CallbackQuery):
+@Client.on_callback_query()
+async def buttons(client:Client, callback_query:types.CallbackQuery):
     if callback_query.data == "delete":
         return await callback_query.message.delete()
     data = callback_query.data.split("|")
@@ -11,12 +12,12 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         artist = client.dezapi.get_artist(id)
         keyboard = [
             [
-                pyrogram.types.InlineKeyboardButton(text="Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
-                pyrogram.types.InlineKeyboardButton(text="Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
+                types.InlineKeyboardButton(text="Tracks 💿", switch_inline_query_current_chat=F".trks {artist['id']}"),
+                types.InlineKeyboardButton(text="Albums 📼", switch_inline_query_current_chat=F".albs {artist['id']}")
             ],
-            [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
+            [types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
         ]
-        markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
+        markup = types.InlineKeyboardMarkup(keyboard)
         await callback_query.message.reply_photo(photo=artist['picture_big'], caption=artist['name'], reply_markup=markup)
         await callback_query.answer(F"Went to {artist['name']}'s Info...")
     elif relate == "goalbum":
@@ -25,13 +26,13 @@ async def buttons(client:pyrogram.Client, callback_query:pyrogram.types.Callback
         keyboard = []
         counter = 1
         for track in tracks:
-            key = [pyrogram.types.InlineKeyboardButton(F"{counter}. {track['title']} 💿", callback_data=F"download|{track['id']}")]
+            key = [types.InlineKeyboardButton(F"{counter}. {track['title']} 💿", callback_data=F"download|{track['id']}")]
             keyboard.append(key)
             counter += 1
-        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
-        keyboard.append([pyrogram.types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
-        keyboard.append([pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")])
-        markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
+        keyboard.append([types.InlineKeyboardButton(F"Get all Tracks 💽", callback_data=F"getall|{album['id']}")])
+        keyboard.append([types.InlineKeyboardButton(F"Go to Artist 👤", callback_data=F"goartist|{album['artist']['id']}")])
+        keyboard.append([types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")])
+        markup = types.InlineKeyboardMarkup(keyboard)
         await callback_query.message.reply_photo(photo=album['cover_big'], caption=F"{album['title']} - {album['artist']['name']}", reply_markup=markup)
         await callback_query.answer(F"Went to {album['artist']['name']}'s {album['title']} Album...")
     elif relate == "getall":

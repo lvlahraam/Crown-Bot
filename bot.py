@@ -1,18 +1,20 @@
-import pyrogram, deezloader.deezloader, logging, os
+from pyrogram import Client, types
+from deezloader import deezloader.DeeLogin, deezloader.API
+import logging, os
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-app = pyrogram.Client(session_name="crownmusicbot", bot_token=os.getenv("TOKEN"), api_id=os.getenv("API_ID"), api_hash=os.getenv("API_HASH"), plugins=dict(root="plugins")) 
+app = Client(session_name="crownmusicbot", bot_token=os.getenv("TOKEN"), api_id=os.getenv("API_ID"), api_hash=os.getenv("API_HASH"), plugins=dict(root="plugins")) 
 
-app.dezlog = deezloader.deezloader.DeeLogin(arl=os.getenv("ARL"))
-app.dezapi = deezloader.deezloader.API()
+app.dezlog = deezloader.DeeLogin(arl=os.getenv("ARL"))
+app.dezapi = deezloader.API()
 
 app.downloads = {}
 
-async def progress(name:str, message:pyrogram.types.Message, current:int, total:int):
+async def progress(name:str, message:types.Message, current:int, total:int):
     await message.edit_text(F"Uploading: / {name} \ {current * 100 / total:.1f}%")
 app.progress = progress
 

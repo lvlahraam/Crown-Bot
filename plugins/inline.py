@@ -1,7 +1,7 @@
-import pyrogram, string
+from pyrogram import Client, types
 
-@pyrogram.Client.on_inline_query()
-async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery):
+@Client.on_inline_query()
+async def inline(client:Client, inline_query:types.InlineQuery):
     text = inline_query.query.split(" ")
     option = text[0]
     query = " ".join(text[1:])
@@ -16,11 +16,11 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 if query.isdigit():
                     search = client.dezapi.get_artist_top_albums(query, limit=10)
                 else:
-                    item = result = pyrogram.types.InlineQueryResultArticle(
+                    item = result = types.InlineQueryResultArticle(
                         id="BADALBUMSSEARCH",
                         title="Not an ID!",
                         description="Query must be the artist's ID",
-                        input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                        input_message_content=types.InputTextMessageContent("/help")
                     )
                     results.append(item)
             elif option == ".trk":
@@ -29,11 +29,11 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                 if query.isdigit():
                     search = client.dezapi.get_artist_top_tracks(query, limit=10)
                 else:
-                    item = result = pyrogram.types.InlineQueryResultArticle(
+                    item = result = types.InlineQueryResultArticle(
                         id="BADALBUMSSEARCH",
                         title="Not an ID!",
                         description="Query must be the artist's ID",
-                        input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                        input_message_content=types.InputTextMessageContent("/help")
                     )
                     results.append(item)
             datas = search['data']
@@ -53,38 +53,38 @@ async def inline(client:pyrogram.Client, inline_query:pyrogram.types.InlineQuery
                         description = F"{data['artist']['name']}\n{data['album']['title']}\n{data.get('release_date') or ''}"
                         thumbnail = data['album']['cover']
                     if data['id'] not in added:
-                        result = pyrogram.types.InlineQueryResultArticle(
+                        result = types.InlineQueryResultArticle(
                             id=data['id'],
                             title=name,
                             description=description,
                             thumb_url=thumbnail,
-                            input_message_content=pyrogram.types.InputTextMessageContent(data['link'])
+                            input_message_content=types.InputTextMessageContent(data['link'])
                         )
                         results.append(result)
                         added.append(data['id'])
                     else: pass
             else:
-                result = pyrogram.types.InlineQueryResultArticle(
+                result = types.InlineQueryResultArticle(
                     id="404",
                     title="Couldn't found anything",
                     description="Try to search for something else",
-                    input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                    input_message_content=types.InputTextMessageContent("/help")
                 )
                 results.append(result)
         else:
-                result = pyrogram.types.InlineQueryResultArticle(
+                result = types.InlineQueryResultArticle(
                     id="INVALIDQUERY",
                     title="Query cannot be spaces",
                     description="You need to pass a valid query",
-                    input_message_content=pyrogram.types.InputTextMessageContent("/help")
+                    input_message_content=types.InputTextMessageContent("/help")
                 )
                 results.append(result)
     else:
-        result = pyrogram.types.InlineQueryResultArticle(
+        result = types.InlineQueryResultArticle(
             id="INVALIDTAGUSAGE",
             title="Not a Valid Tag",
             description="Usable tags: .art\n.alb - .albs\n.trk - .trks",
-            input_message_content=pyrogram.types.InputTextMessageContent("/help")
+            input_message_content=types.InputTextMessageContent("/help")
         )
         results.append(result)
     await inline_query.answer(results=results)
