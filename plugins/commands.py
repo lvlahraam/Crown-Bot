@@ -21,6 +21,20 @@ async def me(client:pyrogram.Client, message:pyrogram.types.Message):
     me = message.from_user
     await message.reply_text(text=F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
 
+@pyrogram.Client.on_message(pyrogram.filters.command("commands") & pyrogram.filters.user(755341301))
+async def commands(client:pyrogram.Client, message:pyrogram.types.Message):
+    if len(message.command) > 1:
+        items = message.command[1]
+        botcommands = []
+        for item in items:
+            command = item.split(".")
+            botcommands.append(pyrogram.types.BotCommand(command[0], command[2]))
+        await client.set_bot_commands(botcommands)
+        text = "Commands has been setted"
+    else:
+        text = "You must past atleast one command"
+    await message.reply_text(text=text)
+
 @pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
 async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     env = {
@@ -30,9 +44,6 @@ async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     }
     body = message.command[1]
     env.update(globals())
-    if body.startswith("```") and body.endswith("```"):
-        body = "\n".join(body.split("\n")[1:-1])
-    body = body.strip("` \n")
     stdout = io.StringIO()
     to_compile = F"async def func():\n{textwrap.indent(body, '  ')}"
     try:
@@ -49,7 +60,7 @@ async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
     else:
         value = stdout.getvalue()
         try:
-            await message.add_reaction("\u2705")
+            await message.reply_text(text="\u2705")
         except:
             pass
         if ret is None:
