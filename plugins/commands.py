@@ -1,4 +1,4 @@
-from pyrogram import Client, filters, types
+from pyrogram import Client, filters, types, errors
 
 @Client.on_message(filters.command("start"))
 async def start(client:Client, message:types.Message):
@@ -8,7 +8,7 @@ async def start(client:Client, message:types.Message):
 async def search(client:Client, message:types.Message):
     if len(message.command) > 1:
         query = message.command[1]
-        text = F"Searched: {query}"
+        text = F"Searched for {query}"
         keyboard = [
             [types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {query}")],
             [
@@ -25,16 +25,19 @@ async def search(client:Client, message:types.Message):
 
 @Client.on_message(filters.command("info"))
 async def info(client:Client, message:types.Message):
-    if len(message.command) > 1:
-        users = await client.get_users(message.command[1].split(","))
-        if len(users) > 1:
-            for user in users:
-                await message.reply_text(text=F"ID: {user.id}\nUser Name: {user.username}\nFirst Name: {user.first_name}\nLast name: {user.last_name}\nPhone Number: {user.phone_number}\nStatus: {user.status}\nMention: {user.mention}")
-            await message.reply_text(text="Done!")
+    try:
+        if len(message.command) > 1:
+            users = await client.get_users(message.command[1].split(", "))
+            if len(users) > 1:
+                for user in users:
+                    await message.reply_text(text=F"ID: {user.id}\nUser Name: {user.username}\nFirst Name: {user.first_name}\nLast name: {user.last_name}\nPhone Number: {user.phone_number}\nStatus: {user.status}\nMention: {user.mention}")
+                await message.reply_text(text="Done!")
+            else:
+                await message.reply_text(text="Couldn't find any user with this given info")
         else:
-            await message.reply_text(text="Couldn't find any user with this given info")
-    else:
-        await message.reply_text(text=F"ID: {message.from_user.id}\nUser Name: {message.from_user.username}\nFirst Name: {message.from_user.first_name}\nLast name: {message.from_user.last_name}\nPhone Number: {message.from_user.phone_number}\nStatus: {message.from_user.status}\nMention: {message.from_user.mention}")
+            await message.reply_text(text=F"ID: {message.from_user.id}\nUser Name: {message.from_user.username}\nFirst Name: {message.from_user.first_name}\nLast name: {message.from_user.last_name}\nPhone Number: {message.from_user.phone_number}\nStatus: {message.from_user.status}\nMention: {message.from_user.mention}")
+    except errors.FloodWait as e:
+        await message.reply_text(text=F"Wait '{e.x}' seconds before continuing!")
 
 @Client.on_message(filters.command("help"))
 async def help(client:Client, message:types.Message):
