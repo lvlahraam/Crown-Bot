@@ -23,6 +23,11 @@ async def search(client:pyrogram.Client, message:pyrogram.types.Message):
         markup = None
     await message.reply_text(text=text, reply_markup=markup)
 
+@pyrogram.Client.on_message(pyrogram.filters.command("me"))
+async def me(client:pyrogram.Client, message:pyrogram.types.Message):
+    me = message.from_user
+    await message.reply_text(text=F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
+
 @pyrogram.Client.on_message(pyrogram.filters.command("help"))
 async def help(client:pyrogram.Client, message:pyrogram.types.Message):
     keyboard = [
@@ -33,58 +38,4 @@ async def help(client:pyrogram.Client, message:pyrogram.types.Message):
         ],
     ]
     markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
-    await message.reply_text(text="You can search for music by sending a message\nOr sending a Deezer URL\nOr by mentioning me in the chat and using:\n.art (as artist) - .alb (as album) - .trk (as track) tags and typing the query you want in front of it\nFor example: `@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow\n\nFor artist's albums you could do\nFor example: `@crownmusicbot .albs [artist's deezer id]`\nFor artist's tracks you could do\nFor example: `@crownmusicbot .trks [artist's deezer id]`\nOr even by just searching for the artist and then click on albums or tracks button\n\nIf you wanted to see some information about yourself\nYou could try the /me command", reply_markup=markup)
-
-@pyrogram.Client.on_message(pyrogram.filters.command("me"))
-async def me(client:pyrogram.Client, message:pyrogram.types.Message):
-    me = message.from_user
-    await message.reply_text(text=F"ID: {me.id}\nUser Name: {me.username}\nFirst Name: {me.first_name}\nLast name: {me.last_name}\nPhone Number: {me.phone_number}\nStatus: {me.status}\nMention: {me.mention}")
-
-@pyrogram.Client.on_message(pyrogram.filters.command("commands") & pyrogram.filters.user(755341301))
-async def commands(client:pyrogram.Client, message:pyrogram.types.Message):
-    if len(message.command) > 1:
-        items = message.command[1].split(",")
-        botcommands = []
-        for item in items:
-            command = item.split(".")
-            botcommands.append(pyrogram.types.BotCommand(command[0], command[2]))
-        text = "Commands has been settled"
-    else:
-        botcommands = None
-        text = "Commands has been removed"
-    await client.send(pyrogram.raw.functions.bots.SetBotCommands(scope=None, lang_code="", commands=botcommands))
-    await message.reply_text(text=text)
-
-@pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
-async def eval(client:pyrogram.Client, message:pyrogram.types.Message):
-    env = {
-        "pyrogram": pyrogram,
-        "client": client,
-        "message": message
-    }
-    body = message.command[1]
-    env.update(globals())
-    stdout = io.StringIO()
-    to_compile = F"async def func():\n{textwrap.indent(body, '  ')}"
-    try:
-        exec(to_compile, env)
-    except Exception as e:
-        return await message.reply_text(text=F"`{e.__class__.__name__}: {e}`")
-    func = env["func"]
-    try:
-        with contextlib.redirect_stdout(stdout):
-            ret = await func()
-    except Exception as e:
-        value = stdout.getvalue()
-        await message.reply_text(text=F"`{value}{traceback.format_exc()}`")
-    else:
-        value = stdout.getvalue()
-        try:
-            await message.reply_text(text="\u2705")
-        except:
-            pass
-        if ret is None:
-            if value:
-                await message.reply_text(text=F"`{value}`")
-        else:
-            await message.reply_text(text=F"`{value}{ret}`")
+    await message.reply_text(text="You can search for music by using the /search command\nAnd putting a search query in front of it for example:\n`/search Eminem`\n\nOr by sending a Deezer URL\nOr by tagging me in the text field and using:\n.art (as artist) - .alb (as album) - .trk (as track) tags and typing the query you want in front of it for example:\n`@crownmusicbot .alb Dawn Fm`\n\nOr even by using these buttons bellow\n\nFor artist's albums you could do:\n`@crownmusicbot .albs [artist's deezer id]`\nFor artist's tracks you could do:\n `@crownmusicbot .trks [artist's deezer id]`\nOr even by just searching for the artist and then click on albums or tracks button\n\nIf you wanted to see some information about yourself\nYou could try the /me command", reply_markup=markup)
