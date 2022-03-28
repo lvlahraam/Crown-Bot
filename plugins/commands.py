@@ -33,7 +33,7 @@ async def info(client:Client, message:types.Message):
                     await message.reply_text(text=F"ID: {user.id}\nUser Name: {user.username}\nFirst Name: {user.first_name}\nLast name: {user.last_name}\nPhone Number: {user.phone_number}\nStatus: {user.status}\nMention: {user.mention}")
                 await message.reply_text(text="Done!")
             except errors.UsernameNotOccupied as e:
-                await message.reply_text(text="Couldn't find any user with this given info")
+                await message.reply_text(text=F"Couldn't find any user with this given info: {e.x}")
         else:
             await message.reply_text(text=F"ID: {message.from_user.id}\nUser Name: {message.from_user.username}\nFirst Name: {message.from_user.first_name}\nLast name: {message.from_user.last_name}\nPhone Number: {message.from_user.phone_number}\nStatus: {message.from_user.status}\nMention: {message.from_user.mention}")
     except errors.FloodWait as e:
