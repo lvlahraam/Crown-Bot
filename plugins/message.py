@@ -1,6 +1,6 @@
 import pyrogram
 
-@pyrogram.Client.on_message(pyrogram.filters.private | pyrogram.filters.regex("deezer.com"))
+@pyrogram.Client.on_message(pyrogram.filters.text & (pyrogram.filters.private | pyrogram.filters.regex("deezer.com")))
 async def search(client:pyrogram.Client, message:pyrogram.types.Message):
     text = message.text
     if "deezer.com" in text:
