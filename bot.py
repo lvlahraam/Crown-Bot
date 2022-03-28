@@ -1,5 +1,5 @@
 from pyrogram import Client, types
-from deezloader import deezloader.DeeLogin, deezloader.API
+from deezloader import deezloader
 import logging, os
 
 logging.basicConfig(
