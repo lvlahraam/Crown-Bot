@@ -4,6 +4,25 @@ import pyrogram, io, textwrap, contextlib, traceback
 async def start(client:pyrogram.Client, message:pyrogram.types.Message):
     await message.reply_text(text="Hi, I'm Crown, I can help you find the music you want\nTry my /help command to see what commands I've got")
 
+@pyrogram.Client.on_message(pyrogram.filters.command("search"))
+async def search(client:pyrogram.Client, message:pyrogram.types.Message):
+    if len(message.command) > 1:
+        query = message.command[1]
+        text = F"Searched: {query}"
+        keyboard = [
+            [pyrogram.types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {query}")],
+            [
+                pyrogram.types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=F".alb {query}"),
+                pyrogram.types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=F".trk {query}")
+            ],
+            [pyrogram.types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")]
+        ]
+        markup = pyrogram.types.InlineKeyboardMarkup(keyboard)
+    else:
+        text = "You must pass an query"
+        markup = None
+    await message.reply_text(text=text, reply_markup=markup)
+
 @pyrogram.Client.on_message(pyrogram.filters.command("help"))
 async def help(client:pyrogram.Client, message:pyrogram.types.Message):
     keyboard = [
@@ -24,16 +43,16 @@ async def me(client:pyrogram.Client, message:pyrogram.types.Message):
 @pyrogram.Client.on_message(pyrogram.filters.command("commands") & pyrogram.filters.user(755341301))
 async def commands(client:pyrogram.Client, message:pyrogram.types.Message):
     if len(message.command) > 1:
-        items = message.command[1].split("/")
+        items = message.command[1].split(",")
         botcommands = []
         for item in items:
             command = item.split(".")
             botcommands.append(pyrogram.types.BotCommand(command[0], command[2]))
-        await client.set_bot_commands(botcommands)
         text = "Commands has been settled"
     else:
-        await client.set_bot_commands(None)
+        botcommands = None
         text = "Commands has been removed"
+    await client.send(pyrogram.raw.functions.bots.SetBotCommands(scope=None, lang_code="", commands=botcommands))
     await message.reply_text(text=text)
 
 @pyrogram.Client.on_message(pyrogram.filters.command("eval") & pyrogram.filters.user(755341301))
