@@ -1,4 +1,4 @@
-from pyrogram import Client, types
+from pyrogram import Client
 from deezloader import deezloader
 import logging, os
 
@@ -13,9 +13,5 @@ app.dezlog = deezloader.DeeLogin(arl=os.getenv("ARL"))
 app.dezapi = deezloader.API()
 
 app.downloads = {}
-
-async def progress(name:str, message:types.Message, current:int, total:int):
-    await message.edit_text(F"Uploading: / {name} \ {current * 100 / total:.1f}%")
-app.progress = progress
 
 app.run()

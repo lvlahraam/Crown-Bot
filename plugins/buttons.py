@@ -1,6 +1,9 @@
 from pyrogram import Client, types
 import os
 
+async def progress(name:str, message:types.Message, current:int, total:int):
+    await message.edit_text(F"Uploading: / {name} \ {current * 100 / total:.1f}%")
+
 @Client.on_callback_query()
 async def buttons(client:Client, callback_query:types.CallbackQuery):
     if callback_query.data == "delete":
@@ -56,7 +59,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
                     recursive_download=True,
                     method_save=1
                 )
-                await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await client.progress(track['title'], queue, counter, len(tracks)))
+                await client.send_audio(chat_id=callback_query.message.chat.id, audio=download.song_path, title=track['title'], performer=track['artist']['name'], duration=track['duration'], progress=await progress(track['title'], queue, counter, len(tracks)))
                 os.remove(download.song_path)
                 counter += 1
             await queue.delete()
