@@ -95,5 +95,8 @@ async def eval(client:Client, message:types.Message):
         await message.reply_text(final_output, quote=True)
 
 async def aexec(code, client, message):
-    exec("async def __aexec(client, message): " + "".join(f"\n {l_}" for l_ in code.split("\n")))
+    exec(
+        "async def __aexec(client, message): "
+        + "".join(f"\n {l_}" for l_ in code.split("\n"))
+    )
     return await locals()["__aexec"](client, message)
