@@ -54,7 +54,7 @@ async def help(client:Client, message:types.Message):
 
 @Client.on_message(filters.command("eval") & filters.user(755341301))
 async def eval(client:Client, message:types.Message):
-    cmd = message.command[1]
+    cmd = message.text.split(" ", maxsplit=1)[1]
     old_stderr = sys.stderr
     old_stdout = sys.stdout
     redirected_output = sys.stdout = io.StringIO()
