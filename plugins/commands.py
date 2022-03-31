@@ -8,7 +8,7 @@ async def start(client:Client, message:types.Message):
 @Client.on_message(filters.command("search"))
 async def search(client:Client, message:types.Message):
     if len(message.command) > 1:
-        query = message.command[1:]
+        query = message.text.split(" ", maxsplit=1)[1]
         text = F"Searched for {query}"
         keyboard = [
             [types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {query}")],
@@ -29,7 +29,7 @@ async def info(client:Client, message:types.Message):
     try:
         if len(message.command) > 1:
             try:
-                users = await client.get_users(message.command[1:].split(", "))
+                users = await client.get_users(message.text.split(" ")[1:])
                 for user in users:
                     await message.reply_text(text=F"ID: {user.id}\nUser Name: {user.username}\nFirst Name: {user.first_name}\nLast name: {user.last_name}\nPhone Number: {user.phone_number}\nStatus: {user.status}\nMention: {user.mention}")
                 await message.reply_text(text="Done!")
@@ -54,7 +54,7 @@ async def help(client:Client, message:types.Message):
 
 @Client.on_message(filters.command("eval") & filters.user(755341301))
 async def eval(client:Client, message:types.Message):
-    cmd = message.command[1:]
+    cmd = message.text.split(" ", maxsplit=1)[1]
     old_stderr = sys.stderr
     old_stdout = sys.stdout
     redirected_output = sys.stdout = io.StringIO()
