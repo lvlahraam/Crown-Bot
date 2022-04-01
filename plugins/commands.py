@@ -31,7 +31,7 @@ async def kill(client:Client, message:types.Message):
         data = download.get("data")
         keyboard = [[types.InlineKeyboardButton(text="Kill Download 🔪", callback_data="kill")]]
         markup = types.InlineKeyboardMarkup(keyboard)
-        await message.reply_photo(photo=data.get("cover_big") or data.get("album").get("cover_big"), caption=F"Are you sure you want to kill the download for:\n{data['artist']['name']} - {data['title']}, reply_markup=markup)
+        await message.reply_photo(photo=data.get("cover_big") or data.get("album").get("cover_big"), caption=F"Are you sure you want to kill the download for:\n{data['artist']['name']} - {data['title']}", reply_markup=markup)
     else:
         await message.reply_text(text="You are currently not downloading anything...")
 
