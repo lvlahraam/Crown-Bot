@@ -59,7 +59,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
             queue = await callback_query.message.reply_text(text=F"Uploading...")
             counter = 1
             for track in tracks:
-                if client.downloads(str(callback_query.from_user.id)).get("kill") == True:
+                if client.downloads.get(str(callback_query.from_user.id)).get("kill") == True:
                     break
                 download = client.dezlog.download_trackdee(
                     track['link'],
