@@ -12,7 +12,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         download = client.downloads.get(callback_query.message.from_user.id)
         if download:
             data = download.get("data")
-            del client.downloads[callback_query.message.from_user.id]
+            downloads['kill'] = True
             return await callback_query.answer(F"Killed the download of\n{data['name']} - {data['title']}...")
         else:
             return await callback_query.answer("Nothing is getting downloaded...")
@@ -50,7 +50,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         downloading = client.downloads.get(callback_query.message.from_user.id)
         if downloading:
             await callback_query.answer("You have to wait...")
-            await callback_query.message.reply_text(text=F"You are currently downloading:\n{downloading}\nPlease wait for it to complete!")
+            await callback_query.message.reply_text(text=F"You are currently downloading:\n{downloading['data']['artist']['name']} - {downloading['data']['title']}\nPlease wait for it to complete!")
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
