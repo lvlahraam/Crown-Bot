@@ -12,6 +12,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         download = client.downloads.get(callback_query.message.from_user.id)
         if download:
             data = download.get("data")
+            del client.downloads[callback_query.message.from_user.id]
             return await callback_query.answer(F"Killed the download of\n{data['name']} - {data['title']}...")
         else:
             return await callback_query.answer("Nothing is getting downloaded...")
@@ -53,11 +54,12 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         else:
             album = client.dezapi.get_album(id)
             tracks = album['tracks']['data']
-            client.downloads[callback_query.message.from_user.id] = F"{album['title']} by {album['artist']['name']}"
+            client.downloads[callback_query.message.from_user.id] = {"data": album, "kill": False}
             await callback_query.answer(F"Downloading {album['title']} album...")
             queue = await callback_query.message.reply_text(text=F"Uploading...")
             counter = 1
             for track in tracks:
+                if downloading.get("kill") == True: break
                 download = client.dezlog.download_trackdee(
                     track['link'],
                     output_dir=F"./musics/",
