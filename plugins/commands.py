@@ -26,7 +26,7 @@ async def search(client:Client, message:types.Message):
 
 @Client.on_message(filters.command("kill"))
 async def kill(client:Client, message:types.Message):
-    download = client.downloads.get(message.from_user.id)
+    download = client.downloads.get(str(message.from_user.id))
     if download:
         data = download.get("data")
         keyboard = [[types.InlineKeyboardButton(text="Kill Download 🔪", callback_data="kill")]]
