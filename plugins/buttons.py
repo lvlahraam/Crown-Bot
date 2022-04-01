@@ -13,7 +13,7 @@ async def buttons(client:Client, callback_query:types.CallbackQuery):
         if download:
             data = download.get("data")
             download["kill"] = True
-            return await callback_query.answer(F"Killed the download of\n{data['name']} - {data['title']}...")
+            return await callback_query.answer(F"Killed the download of\n{data['artist']['name']} - {data['title']}...")
         else:
             return await callback_query.answer("Nothing is getting downloaded...")
     data = callback_query.data.split("|")
