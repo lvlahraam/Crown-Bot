@@ -8,6 +8,13 @@ async def progress(name:str, message:types.Message, current:int, total:int):
 async def buttons(client:Client, callback_query:types.CallbackQuery):
     if callback_query.data == "delete":
         return await callback_query.message.delete()
+    elif callback_query.data == "kill":
+        download = client.downloads.get(callback_query.message.from_user.id)
+        if download:
+            data = download.get("data")
+            return await callback_query.answer(F"Killed the download of\n{data['name']} - {data['title']}...")
+        else:
+            return await callback_query.answer("Nothing is getting downloaded...")
     data = callback_query.data.split("|")
     relate = data[0]
     id = data[1]
