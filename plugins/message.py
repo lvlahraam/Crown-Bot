@@ -5,6 +5,8 @@ async def message(client:Client, message:types.Message):
     text = message.text
     if "/" in text:
         items = text.split("/")
+        if not len(items) >= 5:
+            return await message.reply_text("Link must be for the artist or album or track!")
         relate = items[3]
         id = items[4]
     else:
