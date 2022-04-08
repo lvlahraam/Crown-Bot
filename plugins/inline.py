@@ -14,7 +14,7 @@ async def inline(client:Client, inline_query:types.InlineQuery):
                 search = client.dezapi.search_album(query=query)
             elif option == ".albs":
                 if query.isdigit():
-                    search = client.dezapi.get_artist_top_albums(query, limit=10)
+                    search = client.dezapi.get_artist_top_albums(query, limit=50)
                 else:
                     item = result = types.InlineQueryResultArticle(
                         id="BADALBUMSSEARCH",
@@ -27,7 +27,7 @@ async def inline(client:Client, inline_query:types.InlineQuery):
                 search = client.dezapi.search_track(query=query)
             elif option == ".trks":
                 if query.isdigit():
-                    search = client.dezapi.get_artist_top_tracks(query, limit=10)
+                    search = client.dezapi.get_artist_top_tracks(query, limit=50)
                 else:
                     item = result = types.InlineQueryResultArticle(
                         id="BADALBUMSSEARCH",
