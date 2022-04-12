@@ -12,7 +12,7 @@ async def search(client:Client, message:types.Message):
         [types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")] 
     ] 
     markup = types.InlineKeyboardMarkup(keyboard)
-    await message.reply_text(text=text, reply_markup=markup)
+    await message.reply_text(text=query, reply_markup=markup)
 
 @Client.on_message(filters.regex("deezer.com"))
 async def message(client:Client, message:types.Message):
