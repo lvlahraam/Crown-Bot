@@ -1,5 +1,19 @@
 from pyrogram import Client, filters, types
 
+@Client.on_message(filters.private)
+async def search(client:Client, message:types.Message):
+    query = message.text
+    keyboard = [ 
+        [types.InlineKeyboardButton(text="Search Artist 👤", switch_inline_query_current_chat=F".art {query}")], 
+        [
+            types.InlineKeyboardButton(text="Search Album 📼", switch_inline_query_current_chat=F".alb {query}"), 
+            types.InlineKeyboardButton(text="Search Track 💿", switch_inline_query_current_chat=F".trk {query}") 
+        ], 
+        [types.InlineKeyboardButton(text="Delete 💣", callback_data="delete")] 
+    ] 
+    markup = types.InlineKeyboardMarkup(keyboard)
+    await message.reply_text(text=text, reply_markup=markup)
+
 @Client.on_message(filters.regex("deezer.com"))
 async def message(client:Client, message:types.Message):
     text = message.text
